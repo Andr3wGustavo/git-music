@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export interface DAWTransportState {
   isPlaying: boolean;
@@ -23,6 +23,9 @@ export interface StemInfo {
   isSolo?: boolean;
   missingPlugin?: string | null;
   isFrozen?: boolean;
+  rmsDb?: number;
+  peakDb?: number;
+  lufsIntegrated?: number;
 }
 
 export interface AudioComment {
@@ -34,6 +37,45 @@ export interface AudioComment {
   message: string;
   createdAt: string;
   resolved: boolean;
+}
+
+export interface MIDINote {
+  id: string;
+  pitch: number; // 0-127 (e.g. 60 = Middle C)
+  startBar: number; // 1.0, 1.25, 2.5
+  durationBars: number; // 0.25, 1.0
+  velocity: number; // 0-127
+  channel?: number;
+  diffStatus?: 'added' | 'removed' | 'modified' | 'unchanged';
+}
+
+export interface MIDITrack {
+  id: string;
+  name: string;
+  color?: string;
+  instrument?: string;
+  notes: MIDINote[];
+}
+
+export interface DAWPluginInfo {
+  name: string;
+  vendor?: string;
+  format: 'vst2' | 'vst3' | 'au' | 'clap' | 'native';
+  isMissing: boolean;
+  presetName?: string;
+  channelIndex?: number;
+}
+
+export interface DAWProjectInspection {
+  dawType: 'flp' | 'als' | 'rpp' | 'logicx' | 'generic';
+  version?: string;
+  bpm: number;
+  timeSigNumerator: number;
+  timeSigDenominator: number;
+  title?: string;
+  plugins: DAWPluginInfo[];
+  audioSamples: string[];
+  midiTracks: MIDITrack[];
 }
 
 export interface CommitNode {
@@ -48,8 +90,10 @@ export interface CommitNode {
     fileHash: string;
     dawType: string;
     bpm: number;
+    inspection?: DAWProjectInspection;
   };
   stems: StemInfo[];
+  midiTracks?: MIDITrack[];
   comments: AudioComment[];
   totalSizeBytes: number;
   dedupSavedBytes: number;
@@ -63,6 +107,31 @@ export interface BranchInfo {
   lastUpdated: string;
 }
 
+export interface PullRequest {
+  id: string;
+  sourceBranch: string;
+  targetBranch: string;
+  title: string;
+  description: string;
+  author: string;
+  authorAvatar?: string;
+  createdAt: string;
+  status: 'open' | 'merged' | 'closed';
+  commitsCount: number;
+  stemChanges: {
+    stemId: string;
+    name: string;
+    action: 'added' | 'modified' | 'deleted' | 'unchanged';
+    spectralCollision?: {
+      frequencyRange: string;
+      withStem: string;
+      severity: 'low' | 'medium' | 'high';
+      suggestion: string;
+    };
+    lufsDelta?: number;
+  }[];
+}
+
 export interface ProjectState {
   projectName: string;
   projectPath: string;
@@ -71,13 +140,23 @@ export interface ProjectState {
   branches: BranchInfo[];
   history: CommitNode[];
   stems: StemInfo[];
+  midiTracks: MIDITrack[];
   comments: AudioComment[];
+  pullRequests: PullRequest[];
   transport: DAWTransportState;
+  inspectedProject?: DAWProjectInspection;
   storageStats: {
     totalTrackedFiles: number;
     totalSizeBytes: number;
     dedupStorageBytes: number;
     savingsPercentage: number;
+  };
+  cloudSyncStatus: {
+    isSynced: boolean;
+    pendingUploads: number;
+    pendingDownloads: number;
+    lastSyncedAt: string | null;
+    endpoint: string;
   };
 }
 
@@ -89,6 +168,8 @@ interface IPCContextType {
   abMode: ABMode;
   crossfade: number; // 0.0 = Live DAW, 1.0 = Target Snapshot
   selectedCommit: CommitNode | null;
+  activeView: 'waveform' | 'piano_roll';
+  setActiveView: (view: 'waveform' | 'piano_roll') => void;
   setSelectedCommit: (commit: CommitNode | null) => void;
   setABMode: (mode: ABMode) => void;
   setCrossfade: (val: number) => void;
@@ -101,6 +182,8 @@ interface IPCContextType {
   toggleMuteStem: (stemId: string) => void;
   toggleSoloStem: (stemId: string) => void;
   toggleFreezeStem: (stemId: string) => void;
+  triggerCloudSync: () => void;
+  mergePullRequest: (prId: string) => void;
 }
 
 const DEFAULT_STATE: ProjectState = {
@@ -135,23 +218,6 @@ const DEFAULT_STATE: ProjectState = {
       totalSizeBytes: 84600000,
       dedupSavedBytes: 64800000,
     },
-    {
-      hash: '01c4d7e',
-      parentHash: null,
-      branch: 'main',
-      message: 'feat(init): Initial arrangement structure and 808 sub-bass setup',
-      author: 'Alex (Lead Producer)',
-      timestamp: new Date(Date.now() - 86400000).toISOString(),
-      dawProject: { fileName: 'Cyberpunk_Bassline_v1.flp', fileHash: 'flp_001', dawType: 'flp', bpm: 128 },
-      stems: [
-        { id: '1', name: '01_Kick_808_Punch.wav', relativePath: 'Audio/01_Kick_808_Punch.wav', sizeBytes: 14500000, hash: 'h1', durationSeconds: 180, sampleRate: 44100, channels: 2 },
-        { id: '2', name: '02_Serum_ReeseBass_Drop.wav', relativePath: 'Audio/02_Serum_ReeseBass_Drop.wav', sizeBytes: 28200000, hash: 'h2', durationSeconds: 180, sampleRate: 44100, channels: 2, missingPlugin: 'Xfer Serum v1.36b', isFrozen: true },
-        { id: '3', name: '03_Lead_CyberArp_Sidechained.wav', relativePath: 'Audio/03_Lead_CyberArp_Sidechained.wav', sizeBytes: 22100000, hash: 'h3', durationSeconds: 180, sampleRate: 44100, channels: 2 },
-      ],
-      comments: [],
-      totalSizeBytes: 64800000,
-      dedupSavedBytes: 0,
-    }
   ],
   stems: [
     { id: '1', name: '01_Kick_808_Punch.wav', relativePath: 'Audio/01_Kick_808_Punch.wav', sizeBytes: 14500000, hash: 'h1', durationSeconds: 180, sampleRate: 44100, channels: 2 },
@@ -159,9 +225,64 @@ const DEFAULT_STATE: ProjectState = {
     { id: '3', name: '03_Lead_CyberArp_Sidechained.wav', relativePath: 'Audio/03_Lead_CyberArp_Sidechained.wav', sizeBytes: 22100000, hash: 'h3', durationSeconds: 180, sampleRate: 44100, channels: 2 },
     { id: '4', name: '04_VocalHook_Autotune_Cleaned.wav', relativePath: 'Audio/04_VocalHook_Autotune_Cleaned.wav', sizeBytes: 19800000, hash: 'h4', durationSeconds: 180, sampleRate: 44100, channels: 2 },
   ],
+  midiTracks: [
+    {
+      id: 'tr_bass',
+      name: '02_Serum_ReeseBass (MIDI)',
+      color: '#00FF66',
+      instrument: 'Serum Sub-Bass',
+      notes: [
+        { id: 'm1', pitch: 36, startBar: 1.0, durationBars: 1.5, velocity: 110, diffStatus: 'unchanged' },
+        { id: 'm2', pitch: 36, startBar: 2.5, durationBars: 0.5, velocity: 115, diffStatus: 'unchanged' },
+        { id: 'm3', pitch: 39, startBar: 3.0, durationBars: 1.0, velocity: 120, diffStatus: 'modified' },
+        { id: 'm4', pitch: 41, startBar: 4.0, durationBars: 0.75, velocity: 125, diffStatus: 'added' },
+      ],
+    },
+    {
+      id: 'tr_lead',
+      name: '03_Lead_CyberArp (MIDI)',
+      color: '#00F0FF',
+      instrument: 'Vital Synth Arp',
+      notes: [
+        { id: 'm5', pitch: 60, startBar: 1.0, durationBars: 0.25, velocity: 95, diffStatus: 'unchanged' },
+        { id: 'm6', pitch: 63, startBar: 1.25, durationBars: 0.25, velocity: 100, diffStatus: 'unchanged' },
+        { id: 'm7', pitch: 67, startBar: 1.5, durationBars: 0.5, velocity: 105, diffStatus: 'added' },
+        { id: 'm8', pitch: 72, startBar: 2.0, durationBars: 0.5, velocity: 110, diffStatus: 'added' },
+        { id: 'm9', pitch: 58, startBar: 2.75, durationBars: 0.25, velocity: 90, diffStatus: 'removed' },
+      ],
+    },
+  ],
   comments: [
     { id: 'c1', author: 'Sarah (Vocalist & Mix)', timestampSeconds: 45.5, barPosition: 16.2, message: 'Ajustei o de-esser no refrão para tirar a sibilância!', createdAt: new Date(Date.now() - 3600000).toISOString(), resolved: false },
     { id: 'c2', author: 'Alex (Lead Producer)', timestampSeconds: 64.0, barPosition: 32.0, message: 'O drop no compasso 32 está monstruoso 🔥.', createdAt: new Date(Date.now() - 1800000).toISOString(), resolved: false },
+  ],
+  pullRequests: [
+    {
+      id: 'pr_001',
+      sourceBranch: 'feat/guitar-solo-take3',
+      targetBranch: 'main',
+      title: 'feat(stems): Add Gibson Les Paul Overdriven Guitar Solo on Drop',
+      description: 'Recorded live 24-bit 48kHz guitar solo over compass 32 to 48 with tube preamp emulation.',
+      author: 'Diego (Guitarist)',
+      authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+      createdAt: new Date(Date.now() - 3600000).toISOString(),
+      status: 'open',
+      commitsCount: 2,
+      stemChanges: [
+        {
+          stemId: 'stem_guitar',
+          name: '05_GuitarSolo_Lead_Overdrive.wav',
+          action: 'added',
+          spectralCollision: {
+            frequencyRange: '1.8 kHz - 3.2 kHz',
+            withStem: '04_VocalHook_Autotune_Cleaned.wav',
+            severity: 'low',
+            suggestion: 'Slight notch EQ at 2.4 kHz recommended to clear space for lead vocal hook.',
+          },
+          lufsDelta: 1.4,
+        },
+      ],
+    },
   ],
   transport: {
     isPlaying: false,
@@ -178,6 +299,13 @@ const DEFAULT_STATE: ProjectState = {
     dedupStorageBytes: 84600000,
     savingsPercentage: 43,
   },
+  cloudSyncStatus: {
+    isSynced: false,
+    pendingUploads: 2,
+    pendingDownloads: 0,
+    lastSyncedAt: new Date().toISOString(),
+    endpoint: 'git-music-audio-chunks @ r2.git-music.io/v1',
+  },
 };
 
 const IPCContext = createContext<IPCContextType | undefined>(undefined);
@@ -185,6 +313,7 @@ const IPCContext = createContext<IPCContextType | undefined>(undefined);
 export const IPCProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [projectState, setProjectState] = useState<ProjectState>(DEFAULT_STATE);
+  const [activeView, setActiveView] = useState<'waveform' | 'piano_roll'>('waveform');
   const [abMode, setABModeState] = useState<ABMode>('live');
   const [crossfade, setCrossfadeState] = useState<number>(0.0);
   const [selectedCommit, setSelectedCommit] = useState<CommitNode | null>(DEFAULT_STATE.history[0]);
@@ -352,6 +481,18 @@ export const IPCProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }));
   };
 
+  const triggerCloudSync = () => {
+    sendIPC('TRIGGER_CLOUD_SYNC', {});
+    setProjectState((prev) => ({
+      ...prev,
+      cloudSyncStatus: { ...prev.cloudSyncStatus, isSynced: true, pendingUploads: 0 },
+    }));
+  };
+
+  const mergePullRequest = (prId: string) => {
+    sendIPC('MERGE_PULL_REQUEST', { prId });
+  };
+
   return (
     <IPCContext.Provider
       value={{
@@ -360,6 +501,8 @@ export const IPCProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         abMode,
         crossfade,
         selectedCommit,
+        activeView,
+        setActiveView,
         setSelectedCommit,
         setABMode,
         setCrossfade,
@@ -372,6 +515,8 @@ export const IPCProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         toggleMuteStem,
         toggleSoloStem,
         toggleFreezeStem,
+        triggerCloudSync,
+        mergePullRequest,
       }}
     >
       {children}

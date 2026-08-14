@@ -1,15 +1,47 @@
 import React, { useState } from 'react';
 import { useIPC } from '../context/IPCContext';
-import { GitBranch, GitCommit, HardDrive, Disc, Activity, Plus, RefreshCw, CheckCircle2, ChevronDown } from 'lucide-react';
+import {
+  GitBranch,
+  GitCommit,
+  HardDrive,
+  Disc,
+  Plus,
+  CheckCircle2,
+  ChevronDown,
+  Cloud,
+  GitPullRequest,
+  Music,
+  Radio,
+} from 'lucide-react';
 
 interface HeaderProps {
   onOpenCommitModal: () => void;
   onOpenBranchModal: () => void;
+  onOpenPullRequestModal: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenCommitModal, onOpenBranchModal }) => {
-  const { projectState, isConnected, checkoutBranch } = useIPC();
+export const Header: React.FC<HeaderProps> = ({
+  onOpenCommitModal,
+  onOpenBranchModal,
+  onOpenPullRequestModal,
+}) => {
+  const {
+    projectState,
+    checkoutBranch,
+    activeView,
+    setActiveView,
+    triggerCloudSync,
+  } = useIPC();
   const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleCloudSync = () => {
+    setIsSyncing(true);
+    triggerCloudSync();
+    setTimeout(() => setIsSyncing(false), 1000);
+  };
+
+  const openPRCount = projectState.pullRequests?.filter((p) => p.status === 'open').length || 0;
 
   return (
     <header className="glass-panel border-b border-studio-border/80 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-2xl">
@@ -26,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCommitModal, onOpenBranchM
               {projectState.projectName}
             </h1>
             <span className="text-xs px-2 py-0.5 rounded-full bg-studio-card border border-studio-border text-studio-accent font-mono">
-              FL Studio 21
+              {projectState.transport.dawName || 'FL Studio 21'}
             </span>
           </div>
           <p className="text-xs text-studio-muted font-mono truncate max-w-md">
@@ -35,8 +67,34 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCommitModal, onOpenBranchM
         </div>
       </div>
 
-      {/* Center: Branch Switcher & CAS Storage Savings */}
-      <div className="flex items-center space-x-4">
+      {/* Center: View Switcher (Waveform vs Piano Roll) & Branch Switcher */}
+      <div className="flex items-center space-x-3">
+        {/* View Toggle Tabs */}
+        <div className="flex items-center p-1 rounded-xl bg-slate-950 border border-slate-800">
+          <button
+            onClick={() => setActiveView('waveform')}
+            className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeView === 'waveform'
+                ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Radio className="w-3.5 h-3.5" />
+            <span>Waveform Audio Diff</span>
+          </button>
+          <button
+            onClick={() => setActiveView('piano_roll')}
+            className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeView === 'piano_roll'
+                ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Music className="w-3.5 h-3.5" />
+            <span>Piano Roll MIDI Diff</span>
+          </button>
+        </div>
+
         {/* Branch Selector Dropdown */}
         <div className="relative">
           <button
@@ -49,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCommitModal, onOpenBranchM
           </button>
 
           {branchDropdownOpen && (
-            <div className="absolute top-full mt-2 left-0 w-64 glass-panel rounded-xl shadow-2xl p-2 z-50 border border-studio-border">
+            <div className="absolute top-full mt-2 left-0 w-64 glass-panel rounded-xl shadow-2xl p-2 z-50 border border-studio-border bg-slate-900">
               <div className="text-[10px] uppercase font-bold text-studio-muted px-2 py-1 tracking-wider">
                 Active Branches
               </div>
@@ -89,32 +147,49 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCommitModal, onOpenBranchM
         </div>
 
         {/* CAS Deduplication Metric Badge */}
-        <div className="hidden lg:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-studio-card/60 border border-studio-border text-xs">
+        <div className="hidden xl:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-studio-card/60 border border-studio-border text-xs">
           <HardDrive className="w-3.5 h-3.5 text-studio-neonGreen" />
           <span className="text-studio-muted">Deduplication:</span>
           <span className="text-studio-neonGreen font-semibold font-mono">
             {projectState.storageStats.savingsPercentage}% Saved
           </span>
-          <span className="text-studio-muted text-[10px]">
-            ({Math.round((projectState.storageStats.totalSizeBytes - projectState.storageStats.dedupStorageBytes) / 1024 / 1024)} MB)
-          </span>
         </div>
       </div>
 
-      {/* Right: IPC Status & Commit Button */}
+      {/* Right: Cloud Sync, Pull Requests & Commit Button */}
       <div className="flex items-center space-x-3">
-        <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-studio-surface border border-studio-border text-xs">
-          <Activity className={`w-3.5 h-3.5 ${isConnected ? 'text-studio-neonGreen' : 'text-studio-neonAmber animate-pulse'}`} />
-          <span className="text-studio-muted text-[11px] font-mono">
-            {isConnected ? 'DAW Engine Active' : 'Local Daemon Standby'}
+        {/* Cloud CAS Sync Button */}
+        <button
+          onClick={handleCloudSync}
+          disabled={isSyncing}
+          className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-cyan-500/40 text-xs font-medium text-slate-300 transition-all"
+        >
+          <Cloud className={`w-3.5 h-3.5 text-cyan-400 ${isSyncing ? 'animate-spin' : ''}`} />
+          <span className="font-mono text-[11px]">
+            {isSyncing ? 'Syncing to R2...' : 'R2 CAS Synced'}
           </span>
-        </div>
+        </button>
 
+        {/* Pull Requests Button */}
+        <button
+          onClick={onOpenPullRequestModal}
+          className="relative flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-emerald-500/40 text-xs font-medium text-slate-300 transition-all group"
+        >
+          <GitPullRequest className="w-3.5 h-3.5 text-emerald-400 group-hover:rotate-12 transition-transform" />
+          <span>Stem PRs</span>
+          {openPRCount > 0 && (
+            <span className="w-4 h-4 rounded-full bg-emerald-500 text-slate-950 font-bold text-[10px] flex items-center justify-center">
+              {openPRCount}
+            </span>
+          )}
+        </button>
+
+        {/* New Commit Button */}
         <button
           onClick={onOpenCommitModal}
-          className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-studio-accent to-cyan-400 hover:from-cyan-300 hover:to-studio-accent text-slate-950 font-bold text-xs shadow-lg shadow-studio-accent/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-studio-accent to-studio-neonPurple hover:opacity-90 text-white text-xs font-semibold shadow-lg shadow-studio-accent/20 transition-all hover:scale-105 active:scale-95"
         >
-          <GitCommit className="w-4 h-4 text-slate-950" />
+          <GitCommit className="w-4 h-4" />
           <span>Commit & Push</span>
         </button>
       </div>

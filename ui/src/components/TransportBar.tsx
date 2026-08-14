@@ -1,6 +1,6 @@
 import React from 'react';
 import { useIPC } from '../context/IPCContext';
-import { Play, Square, Sliders, Volume2, Gauge, Clock } from 'lucide-react';
+import { Play, Square, Sliders, Gauge, Clock } from 'lucide-react';
 
 export const TransportBar: React.FC = () => {
   const { projectState, abMode, crossfade, setABMode, setCrossfade, togglePlay, selectedCommit } = useIPC();

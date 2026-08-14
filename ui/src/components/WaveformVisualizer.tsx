@@ -1,16 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useIPC } from '../context/IPCContext';
-import { MessageSquarePlus, ZoomIn, ZoomOut, Layers, Sparkles } from 'lucide-react';
+import { Layers } from 'lucide-react';
 
 interface WaveformVisualizerProps {
   onAddCommentAtBar: (bar: number) => void;
 }
 
 export const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({ onAddCommentAtBar }) => {
-  const { projectState, selectedCommit } = useIPC();
+  const { projectState } = useIPC();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
-  const [selectedStemIndex, setSelectedStemIndex] = useState<number | null>(null);
 
   const transport = projectState.transport;
   const stems = projectState.stems;

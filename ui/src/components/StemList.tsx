@@ -1,6 +1,6 @@
 import React from 'react';
 import { useIPC } from '../context/IPCContext';
-import { Music, Volume2, VolumeX, AlertTriangle, Snowflake, FileAudio } from 'lucide-react';
+import { Music, AlertTriangle, Snowflake, FileAudio } from 'lucide-react';
 
 export const StemList: React.FC = () => {
   const { projectState, toggleMuteStem, toggleSoloStem, toggleFreezeStem } = useIPC();

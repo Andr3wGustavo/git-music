@@ -1,6 +1,6 @@
 import React from 'react';
-import { useIPC, CommitNode } from '../context/IPCContext';
-import { GitCommit, GitFork, User, Clock, Check, HardDrive, ArrowRight } from 'lucide-react';
+import { useIPC } from '../context/IPCContext';
+import { GitCommit, User, Clock, Check, HardDrive } from 'lucide-react';
 
 export const CommitTimeline: React.FC = () => {
   const { projectState, selectedCommit, setSelectedCommit } = useIPC();
@@ -30,7 +30,7 @@ export const CommitTimeline: React.FC = () => {
 
       {/* Vertical Commit Tree */}
       <div className="space-y-3 relative before:absolute before:top-4 before:bottom-4 before:left-5 before:w-0.5 before:bg-studio-border">
-        {history.map((commit, index) => {
+        {history.map((commit) => {
           const isSelected = selectedCommit?.hash === commit.hash;
           const isHead = projectState.headCommit === commit.hash;
 

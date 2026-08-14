@@ -1,6 +1,6 @@
 import React from 'react';
 import { useIPC } from '../context/IPCContext';
-import { MessageSquare, CheckCircle2, Circle, Clock, CornerDownRight, Plus } from 'lucide-react';
+import { MessageSquare, CheckCircle2, Circle, Plus } from 'lucide-react';
 
 interface AudioCommentsListProps {
   onOpenNewCommentModal: () => void;

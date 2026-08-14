@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useIPC } from '../context/IPCContext';
-import { GitCommit, X, Sparkles, HardDrive } from 'lucide-react';
+import { GitCommit, X, HardDrive } from 'lucide-react';
 
 interface CommitModalProps {
   isOpen: boolean;

@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
-import { IPCProvider } from './context/IPCContext';
+import { IPCProvider, useIPC } from './context/IPCContext';
 import { Header } from './components/Header';
 import { TransportBar } from './components/TransportBar';
 import { WaveformVisualizer } from './components/WaveformVisualizer';
+import { PianoRollDiff } from './components/PianoRollDiff';
 import { CommitTimeline } from './components/CommitTimeline';
 import { StemList } from './components/StemList';
 import { AudioCommentsList } from './components/AudioCommentsList';
 import { CommitModal } from './components/CommitModal';
 import { BranchModal } from './components/BranchModal';
 import { CommentModal } from './components/CommentModal';
+import { PullRequestModal } from './components/PullRequestModal';
 
 const StudioCockpit: React.FC = () => {
+  const { activeView } = useIPC();
   const [isCommitModalOpen, setIsCommitModalOpen] = useState(false);
   const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
+  const [isPullRequestModalOpen, setIsPullRequestModalOpen] = useState(false);
   const [commentModalState, setCommentModalState] = useState<{ isOpen: boolean; barPosition: number }>({
     isOpen: false,
     barPosition: 1.0,
@@ -23,11 +27,12 @@ const StudioCockpit: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#080b11] via-[#0c101a] to-[#080b11] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-[#080b11] via-[#0c101a] to-[#080b11] text-slate-100 flex flex-col font-sans">
       {/* Top Studio Header */}
       <Header
         onOpenCommitModal={() => setIsCommitModalOpen(true)}
         onOpenBranchModal={() => setIsBranchModalOpen(true)}
+        onOpenPullRequestModal={() => setIsPullRequestModalOpen(true)}
       />
 
       {/* Main Workspace Layout */}
@@ -35,8 +40,16 @@ const StudioCockpit: React.FC = () => {
         {/* Real-time DAW Transport & A/B Switcher */}
         <TransportBar />
 
-        {/* Multi-Stem Interactive Waveform Visualizer */}
-        <WaveformVisualizer onAddCommentAtBar={handleAddCommentAtBar} />
+        {/* Dynamic Studio Visualizer: Waveform vs Piano Roll */}
+        <div className="transition-all duration-300">
+          {activeView === 'waveform' ? (
+            <WaveformVisualizer onAddCommentAtBar={handleAddCommentAtBar} />
+          ) : (
+            <div className="h-[480px]">
+              <PianoRollDiff />
+            </div>
+          )}
+        </div>
 
         {/* 2-Column Grid: Left (Timeline & Stems), Right (Feedback & Stems) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -66,6 +79,10 @@ const StudioCockpit: React.FC = () => {
         isOpen={commentModalState.isOpen}
         barPosition={commentModalState.barPosition}
         onClose={() => setCommentModalState({ isOpen: false, barPosition: 1.0 })}
+      />
+      <PullRequestModal
+        isOpen={isPullRequestModalOpen}
+        onClose={() => setIsPullRequestModalOpen(false)}
       />
     </div>
   );
