@@ -1,0 +1,32 @@
+{
+  "name": "@git-music/daemon",
+  "version": "0.1.0",
+  "description": "Git-Music Local Engine: Content-Addressable Storage, File Watcher, and WebSocket IPC Daemon",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": [
+    "git",
+    "music",
+    "fl-studio",
+    "ableton",
+    "vst3",
+    "audio-version-control",
+    "deduplication"
+  ],
+  "author": "Git-Music Team",
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
