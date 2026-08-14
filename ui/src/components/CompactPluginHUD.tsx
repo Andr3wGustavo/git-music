@@ -1,7 +1,7 @@
 /**
  * @file CompactPluginHUD.tsx
- * @description Ultra-Compact In-DAW Hardware VST Plugin Interface.
- * Subtle, minimal, hardware-rack aesthetic designed specifically for floating inside FL Studio 21.
+ * @description Pure Black, Minimalist Square-Hardware In-DAW VST Plugin Interface.
+ * Built with Industrial Orange & Electric Blue accents and sharp square tactile controls.
  */
 
 import React, { useState } from 'react';
@@ -77,16 +77,13 @@ export const CompactPluginHUD: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-[460px] mx-auto bg-[#0d1117] border-2 border-[#1e293b] rounded-2xl shadow-2xl overflow-hidden font-sans text-slate-200 select-none">
-      {/* Hardware Screw Top Bar */}
-      <div className="bg-[#161f2e] border-b border-[#1e293b] px-4 py-2 flex items-center justify-between">
+    <div className="w-full max-w-[440px] mx-auto bg-[#000000] border-2 border-[#1a1a1a] rounded-none shadow-2xl overflow-hidden font-mono text-white select-none">
+      {/* Top Header Bar: Pure Black with Orange & Blue Accents */}
+      <div className="bg-[#050505] border-b border-[#1a1a1a] px-3 py-2 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          {/* Simulated hardware screw */}
-          <div className="w-2.5 h-2.5 rounded-full bg-[#334155] border border-[#1e293b] flex items-center justify-center">
-            <div className="w-1.5 h-0.5 bg-[#0f172a]"></div>
-          </div>
-          <span className="text-xs font-black tracking-widest text-cyan-400 font-mono uppercase">
-            GIT-MUSIC <span className="text-[10px] text-slate-500 font-normal">VST3</span>
+          <div className="w-2 h-2 rounded-none bg-[#FF5500]"></div>
+          <span className="text-xs font-black tracking-widest text-white uppercase">
+            GIT-MUSIC <span className="text-[#FF5500]">VST3</span>
           </span>
         </div>
 
@@ -94,158 +91,153 @@ export const CompactPluginHUD: React.FC = () => {
           <button
             onClick={handleCloudSync}
             disabled={isSyncing}
-            className="flex items-center space-x-1 px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-[10px] font-mono text-cyan-300 hover:border-cyan-400 transition-colors"
+            className="flex items-center space-x-1 px-2 py-0.5 rounded-none bg-black border border-[#262626] hover:border-[#0070F3] hover:text-[#0099FF] text-[10px] text-[#a3a3a3] transition-none uppercase"
           >
-            <Cloud className={`w-3 h-3 text-cyan-400 ${isSyncing ? 'animate-spin' : ''}`} />
-            <span>{isSyncing ? 'Syncing...' : 'R2 Cloud'}</span>
+            <Cloud className={`w-3 h-3 ${isSyncing ? 'text-[#0099FF] animate-spin' : 'text-[#737373]'}`} />
+            <span>{isSyncing ? 'SYNCING...' : 'R2 CLOUD'}</span>
           </button>
-          {/* Simulated hardware screw */}
-          <div className="w-2.5 h-2.5 rounded-full bg-[#334155] border border-[#1e293b] flex items-center justify-center">
-            <div className="w-1.5 h-0.5 bg-[#0f172a]"></div>
-          </div>
+          <div className="w-2 h-2 rounded-none bg-[#0070F3]"></div>
         </div>
       </div>
 
-      {/* Main Plugin Body */}
-      <div className="p-4 space-y-3.5">
-        {/* 1. OLED Status Screen (Compact Display) */}
-        <div className="bg-[#05080f] border border-cyan-500/30 rounded-xl p-3 shadow-inner relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-xl pointer-events-none"></div>
-
-          <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 border-b border-slate-800/80 pb-1.5 mb-2">
-            <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="text-slate-200 font-bold">{projectState.transport.dawName || 'FL Studio 21'}</span>
+      {/* Main Body */}
+      <div className="p-3.5 space-y-3 bg-[#000000]">
+        {/* 1. OLED Display Screen (Pure Jet Black, High Contrast) */}
+        <div className="bg-[#050505] border border-[#1a1a1a] rounded-none p-2.5">
+          <div className="flex items-center justify-between text-[10px] text-[#737373] border-b border-[#141414] pb-1 mb-2">
+            <div className="flex items-center space-x-1.5">
+              <span className="w-1.5 h-1.5 rounded-none bg-[#FF5500]"></span>
+              <span className="text-[#e5e5e5] font-bold uppercase">{projectState.transport.dawName || 'FL STUDIO 21'}</span>
             </div>
-            <div className="text-cyan-400 font-bold">
+            <div className="text-[#0099FF] font-bold">
               {transport.bpm.toFixed(1)} BPM • {transport.timeSigNumerator}/{transport.timeSigDenominator}
             </div>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-[9px] uppercase font-mono text-slate-500 block leading-none mb-1">
-                Active Branch & Track
+              <span className="text-[8px] uppercase text-[#525252] block leading-none mb-0.5">
+                BRANCH / SESSION
               </span>
               <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                <GitBranch className="w-3.5 h-3.5 text-purple-400" />
-                <span className="font-mono text-purple-200">{projectState.currentBranch}</span>
+                <GitBranch className="w-3 h-3 text-[#FF5500]" />
+                <span className="text-[#FF5500] font-bold">{projectState.currentBranch}</span>
               </div>
             </div>
 
             <div className="text-right">
-              <span className="text-[9px] uppercase font-mono text-slate-500 block leading-none mb-1">
-                SSD Saved
+              <span className="text-[8px] uppercase text-[#525252] block leading-none mb-0.5">
+                CAS SAVINGS
               </span>
-              <span className="text-xs font-mono font-bold text-emerald-400">
-                {projectState.storageStats.savingsPercentage}% CAS
+              <span className="text-xs font-bold text-[#0099FF]">
+                {projectState.storageStats.savingsPercentage}% SSD
               </span>
             </div>
           </div>
         </div>
 
-        {/* 2. Quick Snapshot Bar (Save Point in 1-Click) */}
-        <div className="bg-[#131b29] border border-[#1e293b] rounded-xl p-3 space-y-2">
-          <label className="text-[10px] font-mono uppercase font-bold text-slate-400 flex items-center justify-between">
-            <span>📸 Salvar Snapshot / Versão</span>
-            <span className="text-[9px] text-slate-500">Auto-Deduplicado</span>
-          </label>
+        {/* 2. Quick Snapshot Bar (Square Minimalist Input & Button) */}
+        <div className="bg-[#050505] border border-[#1a1a1a] rounded-none p-2.5 space-y-1.5">
+          <div className="flex items-center justify-between text-[9px] uppercase font-bold text-[#737373]">
+            <span>📸 SALVAR SNAPSHOT</span>
+            <span className="text-[#525252]">ZERO-EGRESS CAS</span>
+          </div>
 
-          <div className="flex space-x-2">
+          <div className="flex space-x-1.5">
             <input
               type="text"
               value={quickMessage}
               onChange={(e) => setQuickMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleQuickSnapshot()}
-              placeholder="O que mudou? (ex: Drop com 808 mais pesado)..."
-              className="flex-1 bg-[#090d16] border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 font-mono transition-colors"
+              placeholder="Descreva a alteração..."
+              className="flex-1 bg-black border border-[#262626] rounded-none px-2.5 py-1 text-xs text-white placeholder:text-[#525252] focus:outline-none focus:border-[#FF5500] transition-none"
             />
             <button
               onClick={handleQuickSnapshot}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 shrink-0 ${
+              className={`px-3 py-1 rounded-none text-xs font-bold transition-none flex items-center space-x-1 shrink-0 uppercase ${
                 isSaved
-                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30'
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 shadow-md shadow-cyan-500/20 active:scale-95'
+                  ? 'bg-[#FF5500] text-black border border-[#FF5500]'
+                  : 'bg-[#FF5500] hover:bg-[#ff6600] active:bg-[#cc4400] text-black font-extrabold border border-[#FF5500]'
               }`}
             >
               {isSaved ? (
                 <>
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Salvo!</span>
+                  <Check className="w-3 h-3" />
+                  <span>SALVO!</span>
                 </>
               ) : (
                 <>
-                  <Camera className="w-3.5 h-3.5" />
-                  <span>Snapshot</span>
+                  <Camera className="w-3 h-3" />
+                  <span>SALVAR</span>
                 </>
               )}
             </button>
           </div>
         </div>
 
-        {/* 3. A/B Audio Switcher & Stereo VU Meters */}
-        <div className="bg-[#131b29] border border-[#1e293b] rounded-xl p-3 space-y-2.5">
+        {/* 3. A/B Audio Switcher & Stereo VU Meter */}
+        <div className="bg-[#050505] border border-[#1a1a1a] rounded-none p-2.5 space-y-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Sliders className="w-3.5 h-3.5 text-pink-400" />
-              <span className="text-[11px] font-bold text-slate-300 uppercase font-mono">
-                A/B Comparador em Tempo Real
+            <div className="flex items-center space-x-1.5">
+              <Sliders className="w-3.5 h-3.5 text-[#0099FF]" />
+              <span className="text-[10px] font-bold text-[#e5e5e5] uppercase">
+                A/B AUDIO COMPARISON
               </span>
             </div>
 
-            {/* Play Button */}
+            {/* Square Play Button */}
             <button
               onClick={handlePlayToggle}
-              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+              className={`w-6 h-6 rounded-none flex items-center justify-center transition-none border ${
                 transport.isPlaying
-                  ? 'bg-emerald-400 text-slate-950 shadow-md shadow-emerald-400/40 animate-pulse'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-600'
+                  ? 'bg-[#FF5500] text-black border-[#FF5500]'
+                  : 'bg-black text-white hover:border-[#0099FF] hover:text-[#0099FF] border-[#262626]'
               }`}
             >
               {transport.isPlaying ? (
-                <Square className="w-3 h-3 fill-current" />
+                <Square className="w-2.5 h-2.5 fill-current" />
               ) : (
-                <Play className="w-3 h-3 fill-current ml-0.5 text-cyan-400" />
+                <Play className="w-2.5 h-2.5 fill-current ml-0.5 text-[#0099FF]" />
               )}
             </button>
           </div>
 
-          {/* Real-time Hardware VU Meter */}
+          {/* Real-time Hardware Square VU Meter */}
           <VUMeter compact={true} />
 
-          {/* Live vs Snapshot Mode Toggle Pills */}
-          <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#090d16] rounded-lg border border-slate-800 text-[11px] font-mono">
+          {/* Live vs Snapshot Square Switcher Buttons */}
+          <div className="grid grid-cols-2 gap-1 bg-black p-1 border border-[#1a1a1a] text-[10px]">
             <button
               onClick={() => {
                 setABMode('live');
                 handleCrossfade(0.0);
               }}
-              className={`py-1 rounded text-center font-bold transition-all ${
+              className={`py-1 rounded-none text-center font-bold uppercase transition-none border ${
                 abMode === 'live'
-                  ? 'bg-cyan-500 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#FF5500] text-black border-[#FF5500]'
+                  : 'bg-black text-[#737373] hover:text-white border-transparent'
               }`}
             >
-              (A) FL Studio Live
+              (A) FL LIVE MASTER
             </button>
             <button
               onClick={() => {
                 setABMode('snapshot');
                 handleCrossfade(1.0);
               }}
-              className={`py-1 rounded text-center font-bold transition-all ${
+              className={`py-1 rounded-none text-center font-bold uppercase transition-none border ${
                 abMode === 'snapshot'
-                  ? 'bg-pink-500 text-slate-100 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#0070F3] text-white border-[#0070F3]'
+                  : 'bg-black text-[#737373] hover:text-white border-transparent'
               }`}
             >
-              (B) Snapshot [{selectedCommit ? selectedCommit.hash.substring(0, 5) : 'Antigo'}]
+              (B) [{selectedCommit ? selectedCommit.hash.substring(0, 5) : 'SNAPSHOT'}]
             </button>
           </div>
 
-          {/* Crossfader Slider */}
-          <div className="flex items-center space-x-2 pt-1">
-            <span className="text-[9px] font-mono text-slate-500 font-bold">A</span>
+          {/* Square Minimalist Crossfader Slider */}
+          <div className="flex items-center space-x-2 pt-0.5">
+            <span className="text-[8px] text-[#FF5500] font-bold">A (LIVE)</span>
             <input
               type="range"
               min="0"
@@ -253,47 +245,47 @@ export const CompactPluginHUD: React.FC = () => {
               step="0.01"
               value={crossfade}
               onChange={(e) => handleCrossfade(parseFloat(e.target.value))}
-              className="w-full cursor-pointer accent-cyan-400 h-1.5 bg-slate-800 rounded-lg"
+              className="w-full cursor-pointer accent-[#FF5500] h-1 bg-[#141414] rounded-none"
             />
-            <span className="text-[9px] font-mono text-slate-500 font-bold">B</span>
+            <span className="text-[8px] text-[#0099FF] font-bold">B (SNAP)</span>
           </div>
         </div>
 
-        {/* 4. Recent Version History List (1-Click Restore) */}
-        <div className="bg-[#131b29] border border-[#1e293b] rounded-xl p-3 space-y-2">
-          <div className="flex items-center justify-between text-[10px] font-mono uppercase font-bold text-slate-400">
-            <div className="flex items-center space-x-1.5">
-              <Clock className="w-3.5 h-3.5 text-slate-500" />
-              <span>Versões Anteriores</span>
+        {/* 4. Recent Version History List (Square Row Layout) */}
+        <div className="bg-[#050505] border border-[#1a1a1a] rounded-none p-2.5 space-y-1.5">
+          <div className="flex items-center justify-between text-[9px] uppercase font-bold text-[#737373]">
+            <div className="flex items-center space-x-1">
+              <Clock className="w-3 h-3 text-[#525252]" />
+              <span>HISTÓRICO DE VERSÕES</span>
             </div>
-            <span className="text-slate-500">{projectState.history.length} Snapshots</span>
+            <span className="text-[#525252]">{projectState.history.length} COMMITS</span>
           </div>
 
-          <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+          <div className="space-y-1 max-h-40 overflow-y-auto pr-0.5">
             {projectState.history.map((commit, idx) => (
               <div
                 key={commit.hash}
-                className={`flex items-center justify-between p-2 rounded-lg border text-xs transition-colors ${
+                className={`flex items-center justify-between p-1.5 rounded-none border text-[10px] transition-none ${
                   idx === 0
-                    ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-200'
-                    : 'bg-[#090d16] border-slate-800/80 text-slate-300 hover:border-slate-700'
+                    ? 'bg-black border-[#FF5500]/50 text-white'
+                    : 'bg-black border-[#1a1a1a] text-[#a3a3a3] hover:border-[#262626]'
                 }`}
               >
                 <div className="truncate mr-2">
-                  <div className="font-semibold truncate text-[11px] leading-tight">
+                  <div className="font-bold truncate text-[10px] leading-tight text-white">
                     {commit.message}
                   </div>
-                  <div className="text-[9px] text-slate-500 font-mono flex items-center gap-2 mt-0.5">
+                  <div className="text-[8px] text-[#525252] flex items-center gap-1.5 mt-0.5 uppercase">
                     <span>{commit.author.split(' ')[0]}</span>
                     <span>•</span>
-                    <span className="text-cyan-400/80 font-bold">{commit.hash.substring(0, 6)}</span>
+                    <span className="text-[#0099FF]">{commit.hash.substring(0, 6)}</span>
                   </div>
                 </div>
 
                 <div className="shrink-0">
                   {idx === 0 ? (
-                    <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono text-[9px] font-bold border border-cyan-500/40">
-                      Atual
+                    <span className="px-1.5 py-0.5 rounded-none bg-[#FF5500] text-black text-[8px] font-bold">
+                      ATUAL
                     </span>
                   ) : (
                     <button
@@ -301,9 +293,9 @@ export const CompactPluginHUD: React.FC = () => {
                         setABMode('snapshot');
                         handleCrossfade(1.0);
                       }}
-                      className="px-2 py-0.5 rounded bg-slate-800 hover:bg-pink-500/20 hover:text-pink-300 hover:border-pink-500/40 text-slate-400 font-mono text-[9px] border border-slate-700 transition-colors"
+                      className="px-1.5 py-0.5 rounded-none bg-black hover:bg-[#0070F3] hover:text-white text-[#0099FF] text-[8px] font-bold border border-[#0070F3]/40 transition-none uppercase"
                     >
-                      Comparar
+                      OUVIR
                     </button>
                   )}
                 </div>
@@ -312,38 +304,38 @@ export const CompactPluginHUD: React.FC = () => {
           </div>
         </div>
 
-        {/* 5. Footer Quick Actions: Split Sheets & Branching */}
-        <div className="flex items-center justify-between pt-1">
+        {/* 5. Footer Square Action Buttons */}
+        <div className="flex items-center justify-between pt-0.5">
           <button
             onClick={() => setIsSplitSheetOpen(true)}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-bold hover:bg-amber-500/20 transition-colors font-mono"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-none bg-black border border-[#262626] hover:border-[#FF5500] text-[#FF5500] text-[9px] font-bold transition-none uppercase"
           >
-            <Award className="w-3.5 h-3.5 text-amber-400" />
-            <span>Split Sheet (PDF)</span>
+            <Award className="w-3 h-3 text-[#FF5500]" />
+            <span>SPLIT SHEET (PDF)</span>
           </button>
 
           <button
             onClick={() => setShowBranches(!showBranches)}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[10px] font-mono transition-colors"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-none bg-black border border-[#262626] hover:border-[#0070F3] text-[#0099FF] text-[9px] font-bold transition-none uppercase"
           >
-            <Layers className="w-3 h-3 text-purple-400" />
-            <span>Branches ({projectState.branches.length})</span>
+            <Layers className="w-3 h-3 text-[#0099FF]" />
+            <span>BRANCHES ({projectState.branches.length})</span>
           </button>
         </div>
 
         {/* Branch Drawer Popup */}
         {showBranches && (
-          <div className="bg-[#090d16] border border-slate-800 rounded-xl p-3 space-y-2 mt-2">
-            <div className="text-[10px] uppercase font-mono font-bold text-slate-400">
-              Alternar ou Criar Branch:
+          <div className="bg-black border border-[#262626] rounded-none p-2.5 space-y-1.5 mt-1">
+            <div className="text-[9px] uppercase font-bold text-[#737373]">
+              CRIAR / TROCAR BRANCH:
             </div>
-            <div className="flex space-x-2">
+            <div className="flex space-x-1">
               <input
                 type="text"
                 value={newBranchName}
                 onChange={(e) => setNewBranchName(e.target.value)}
-                placeholder="Nome da branch (ex: test-guitar)..."
-                className="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs font-mono"
+                placeholder="Nome da branch..."
+                className="flex-1 bg-[#050505] border border-[#262626] rounded-none px-2 py-0.5 text-xs text-white placeholder:text-[#525252] focus:outline-none focus:border-[#0070F3]"
               />
               <button
                 onClick={() => {
@@ -352,12 +344,12 @@ export const CompactPluginHUD: React.FC = () => {
                     setNewBranchName('');
                   }
                 }}
-                className="px-3 py-1 rounded bg-purple-600 hover:bg-purple-500 text-xs font-bold text-white font-mono"
+                className="px-2.5 py-0.5 rounded-none bg-[#0070F3] hover:bg-[#0060df] text-xs font-bold text-white uppercase"
               >
-                Criar
+                CRIAR
               </button>
             </div>
-            <div className="space-y-1 max-h-24 overflow-y-auto">
+            <div className="space-y-0.5 max-h-24 overflow-y-auto">
               {projectState.branches.map((b) => (
                 <button
                   key={b.name}
@@ -365,13 +357,13 @@ export const CompactPluginHUD: React.FC = () => {
                     checkoutBranch(b.name);
                     setShowBranches(false);
                   }}
-                  className={`w-full text-left px-2 py-1 rounded text-[10px] font-mono truncate transition-colors ${
+                  className={`w-full text-left px-2 py-1 rounded-none text-[9px] font-mono truncate transition-none uppercase ${
                     b.name === projectState.currentBranch
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                      : 'text-slate-400 hover:bg-slate-800'
+                      ? 'bg-[#141414] text-[#FF5500] border-l-2 border-[#FF5500] font-bold'
+                      : 'text-[#737373] hover:text-white hover:bg-[#0a0a0a]'
                   }`}
                 >
-                  {b.name === projectState.currentBranch ? '● ' : '○ '}
+                  {b.name === projectState.currentBranch ? '■ ' : '□ '}
                   {b.name}
                 </button>
               ))}

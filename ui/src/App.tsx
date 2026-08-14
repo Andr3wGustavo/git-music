@@ -37,36 +37,36 @@ const StudioAppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
-      {/* Top Floating Mini Bar to switch to Full Studio if needed */}
-      <div className="w-full max-w-[460px] flex items-center justify-between text-[11px] font-mono text-slate-500 mb-2 px-1">
-        <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-          FL Studio 21 Connected
+    <div className="min-h-screen bg-[#000000] text-white flex flex-col items-center justify-center p-2 sm:p-4 font-mono select-none">
+      {/* Top Floating Mini Status Bar */}
+      <div className="w-full max-w-[440px] flex items-center justify-between text-[9px] uppercase font-bold text-[#525252] mb-1.5 px-0.5">
+        <span className="flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-none bg-[#FF5500]"></span>
+          FL STUDIO 21 :: IN-DAW VST
         </span>
         <button
           onClick={() => setIsExpandedMode(!isExpandedMode)}
-          className="flex items-center space-x-1 hover:text-cyan-400 transition-colors"
+          className="flex items-center space-x-1 text-[#737373] hover:text-[#0099FF] transition-none"
         >
           {isExpandedMode ? (
             <>
-              <Minimize2 className="w-3.5 h-3.5" />
-              <span>Modo VST Compacto</span>
+              <Minimize2 className="w-3 h-3 text-[#FF5500]" />
+              <span>MINI VST</span>
             </>
           ) : (
             <>
-              <Maximize2 className="w-3.5 h-3.5" />
-              <span>Expandir Studio Pro</span>
+              <Maximize2 className="w-3 h-3 text-[#0099FF]" />
+              <span>EXPAND PRO</span>
             </>
           )}
         </button>
       </div>
 
-      {/* Main View: Default is the Minimalist Hardware VST Rack */}
+      {/* Main View: Default is the Pure Black Square Minimalist VST HUD */}
       {!isExpandedMode ? (
         <CompactPluginHUD />
       ) : (
-        <div className="w-full max-w-7xl space-y-6">
+        <div className="w-full max-w-7xl space-y-4 bg-black border border-[#1a1a1a] p-4 rounded-none">
           <Header
             onOpenCommitModal={() => setIsCommitModalOpen(true)}
             onOpenBranchModal={() => setIsBranchModalOpen(true)}
@@ -76,7 +76,7 @@ const StudioAppContent: React.FC = () => {
             isAICopilotOpen={isAICopilotOpen}
           />
           <TransportBar />
-          <div className="transition-all duration-300 space-y-4">
+          <div className="transition-none space-y-4">
             {activeView === 'waveform' ? (
               <div className="space-y-4">
                 <WaveformVisualizer onAddCommentAtBar={handleAddCommentAtBar} />
@@ -88,11 +88,11 @@ const StudioAppContent: React.FC = () => {
               </div>
             )}
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-7 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div className="lg:col-span-7 space-y-4">
               <CommitTimeline />
             </div>
-            <div className="lg:col-span-5 space-y-6">
+            <div className="lg:col-span-5 space-y-4">
               <StemList />
               <AudioCommentsList onOpenNewCommentModal={() => handleAddCommentAtBar(16.0)} />
             </div>

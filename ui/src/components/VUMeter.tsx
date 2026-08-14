@@ -1,7 +1,6 @@
 /**
  * @file VUMeter.tsx
- * @description Hardware-Grade Stereo LED Peak & RMS VU Meter (-48 dB to +6 dB).
- * Real-time needle/LED ballistics with animated peak hold and clip overload warning.
+ * @description Minimalist Square LED VU Meter in Jet Black, Electric Blue, and Industrial Orange.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -38,73 +37,69 @@ export const VUMeter: React.FC<VUMeterProps> = ({ compact = false }) => {
   const activeLeft = Math.round(levels.leftLinear * ledSegments);
   const activeRight = Math.round(levels.rightLinear * ledSegments);
 
+  // Sharp Square Segment Colors: Blue (-48 to -12dB), Orange (-12 to 0dB), Vivid Orange/Red (+3dB)
   const getLedColor = (index: number) => {
-    if (index >= 14) return 'bg-rose-500 shadow-rose-500/50'; // +3dB, +6dB (Red clip warning)
-    if (index >= 11) return 'bg-amber-400 shadow-amber-400/50'; // 0dB, +1.5dB (Yellow)
-    if (index >= 6) return 'bg-emerald-400 shadow-emerald-400/50'; // -12dB to -3dB (Green)
-    return 'bg-cyan-500 shadow-cyan-500/50'; // -48dB to -18dB (Cyan)
+    if (index >= 14) return 'bg-[#FF3300]'; // Peak Clip (+3dB / +6dB)
+    if (index >= 10) return 'bg-[#FF6600]'; // Industrial Orange (-6dB to 0dB)
+    return 'bg-[#0070F3]'; // Electric Blue (-48dB to -12dB)
   };
 
   return (
-    <div className={`flex items-center space-x-3 bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2 shadow-inner font-mono ${compact ? 'text-[10px]' : 'text-xs'}`}>
+    <div className={`flex items-center space-x-3 bg-black border border-[#1a1a1a] rounded-none p-2 font-mono ${compact ? 'text-[10px]' : 'text-xs'}`}>
       {/* Channel Labels & Numeric dB Values */}
-      <div className="flex flex-col space-y-1.5 text-[10px] text-slate-400 font-bold shrink-0">
+      <div className="flex flex-col space-y-1 text-[9px] text-[#737373] font-mono font-bold shrink-0">
         <div className="flex items-center justify-between space-x-2">
           <span>L</span>
-          <span className={`w-8 text-right ${levels.leftDb > -1 ? 'text-rose-400' : 'text-cyan-400'}`}>
+          <span className={`w-7 text-right ${levels.leftDb > -1 ? 'text-[#FF3300]' : 'text-[#0099FF]'}`}>
             {levels.leftDb > -48 ? `${levels.leftDb.toFixed(0)}` : '-∞'}
           </span>
         </div>
         <div className="flex items-center justify-between space-x-2">
           <span>R</span>
-          <span className={`w-8 text-right ${levels.rightDb > -1 ? 'text-rose-400' : 'text-cyan-400'}`}>
+          <span className={`w-7 text-right ${levels.rightDb > -1 ? 'text-[#FF3300]' : 'text-[#0099FF]'}`}>
             {levels.rightDb > -48 ? `${levels.rightDb.toFixed(0)}` : '-∞'}
           </span>
         </div>
       </div>
 
-      {/* LED Segment Bars */}
-      <div className="flex flex-col space-y-1.5 flex-1 min-w-[100px]">
+      {/* Sharp Square LED Segment Bars */}
+      <div className="flex flex-col space-y-1 flex-1 min-w-[120px]">
         {/* Left Channel Bar */}
-        <div className="flex space-x-0.5 h-2 bg-slate-900 rounded p-0.5 border border-slate-800/80">
+        <div className="flex space-x-[2px] h-2.5 bg-[#0a0a0a] p-[1px] border border-[#1a1a1a]">
           {Array.from({ length: ledSegments }).map((_, i) => (
             <div
               key={`L_${i}`}
-              className={`flex-1 rounded-[1px] transition-all duration-75 ${
-                i < activeLeft
-                  ? `${getLedColor(i)} shadow-sm`
-                  : 'bg-slate-800/40'
+              className={`flex-1 rounded-none transition-none ${
+                i < activeLeft ? getLedColor(i) : 'bg-[#141414]'
               }`}
             />
           ))}
         </div>
 
         {/* Right Channel Bar */}
-        <div className="flex space-x-0.5 h-2 bg-slate-900 rounded p-0.5 border border-slate-800/80">
+        <div className="flex space-x-[2px] h-2.5 bg-[#0a0a0a] p-[1px] border border-[#1a1a1a]">
           {Array.from({ length: ledSegments }).map((_, i) => (
             <div
               key={`R_${i}`}
-              className={`flex-1 rounded-[1px] transition-all duration-75 ${
-                i < activeRight
-                  ? `${getLedColor(i)} shadow-sm`
-                  : 'bg-slate-800/40'
+              className={`flex-1 rounded-none transition-none ${
+                i < activeRight ? getLedColor(i) : 'bg-[#141414]'
               }`}
             />
           ))}
         </div>
       </div>
 
-      {/* Overload Clip Warning Lamp */}
-      <div className="flex flex-col items-center justify-center pl-1 border-l border-slate-800/80 shrink-0">
+      {/* Overload Clip Warning Square Lamp */}
+      <div className="flex flex-col items-center justify-center pl-2 border-l border-[#1a1a1a] shrink-0">
         <div
-          className={`w-2.5 h-2.5 rounded-full border transition-all ${
+          className={`w-3 h-3 rounded-none border transition-none ${
             levels.peakClip
-              ? 'bg-rose-500 border-rose-300 shadow-md shadow-rose-500 animate-ping'
-              : 'bg-slate-900 border-slate-800'
+              ? 'bg-[#FF3300] border-[#FF6600]'
+              : 'bg-[#0a0a0a] border-[#1a1a1a]'
           }`}
-          title="Clip Overload LED (> 0 dBFS)"
+          title="Clip Overload (> 0 dBFS)"
         />
-        <span className="text-[8px] uppercase text-slate-500 mt-0.5">Clip</span>
+        <span className="text-[7px] uppercase font-mono text-[#525252] mt-0.5 font-bold">Clip</span>
       </div>
     </div>
   );
