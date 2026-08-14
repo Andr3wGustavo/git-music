@@ -98,6 +98,28 @@ class ContentAddressableStorage {
         };
     }
     /**
+     * Store a raw Buffer directly in Content-Addressable Storage.
+     */
+    storeBuffer(buf) {
+        const hash = this.computeHash(buf);
+        const prefix = hash.substring(0, 2);
+        const remainder = hash.substring(2);
+        const subDir = path.join(this.objectsDir, prefix);
+        this.ensureDirectoryExists(subDir);
+        const targetBlobPath = path.join(subDir, remainder);
+        let isNew = false;
+        if (!fs.existsSync(targetBlobPath)) {
+            fs.writeFileSync(targetBlobPath, buf);
+            isNew = true;
+        }
+        return {
+            hash,
+            sizeBytes: buf.length,
+            storedPath: targetBlobPath,
+            isNew,
+        };
+    }
+    /**
      * Retrieve the absolute path of a stored blob by its hash.
      */
     getBlobPath(hash) {

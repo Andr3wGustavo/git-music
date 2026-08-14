@@ -62,15 +62,15 @@ export class ALSParser {
 
     // 4. Extract Plugin Devices
     const plugins: DAWPluginInfo[] = [];
-    const pluginNameRegex = /<(?:PlugName|PluginName|DeviceName)\s+Value="([^"]+)"/gi;
+    const pluginNameRegex = /<(?:PlugName|PluginName|DeviceName)\s+Value="([^"]+)"|<(?:Vst3PluginDesc|VstPluginDesc|AuPluginDesc|PluginDesc)[\s\S]*?<Name\s+Value="([^"]+)"/gi;
     let match: RegExpExecArray | null;
     const seenPlugins = new Set<string>();
 
     while ((match = pluginNameRegex.exec(xmlContent)) !== null) {
-      const name = match[1].trim();
+      const name = (match[1] || match[2] || '').trim();
       if (name && !seenPlugins.has(name.toLowerCase())) {
         seenPlugins.add(name.toLowerCase());
-        const isVst = name.toLowerCase().includes('vst') || name.toLowerCase().includes('serum') || name.toLowerCase().includes('pro-q') || name.toLowerCase().includes('vital');
+        const isVst = name.toLowerCase().includes('vst') || name.toLowerCase().includes('serum') || name.toLowerCase().includes('pro-q') || name.toLowerCase().includes('vital') || name.toLowerCase().includes('saturn') || name.toLowerCase().includes('fabfilter');
         plugins.push({
           name,
           format: isVst ? 'vst3' : 'native',
@@ -98,27 +98,57 @@ export class ALSParser {
     while ((match = midiTrackRegex.exec(xmlContent)) !== null) {
       const trackXml = match[0];
       const trackName = match[1] || `MIDI Track ${trackIndex}`;
-
       const notes: MIDINote[] = [];
-      const noteRegex = /<MidiNote\s+[^>]*Time="([0-9.]+)"\s+Duration="([0-9.]+)"\s+Key="([0-9]+)"(?:\s+Velocity="([0-9.]+)")?/gi;
-      let noteMatch: RegExpExecArray | null;
 
-      while ((noteMatch = noteRegex.exec(trackXml)) !== null) {
-        const timeBeats = parseFloat(noteMatch[1]);
-        const durBeats = parseFloat(noteMatch[2]);
-        const key = parseInt(noteMatch[3], 10);
-        const vel = noteMatch[4] ? Math.round(parseFloat(noteMatch[4])) : 100;
+      // Pattern A: KeyTracks containing KeyTrack with MidiKey
+      const keyTrackRegex = /<KeyTrack>[\s\S]*?<MidiKey\s+Value="([0-9]+)"[\s\S]*?<Notes>([\s\S]*?)<\/Notes>[\s\S]*?<\/KeyTrack>/gi;
+      let ktMatch: RegExpExecArray | null;
 
-        const startBar = 1.0 + (timeBeats / 4.0);
-        const durationBars = durBeats / 4.0;
+      while ((ktMatch = keyTrackRegex.exec(trackXml)) !== null) {
+        const key = parseInt(ktMatch[1], 10);
+        const notesXml = ktMatch[2];
+        const noteTagRegex = /<MidiNote\s+[^>]*Time="([0-9.]+)"\s+Duration="([0-9.]+)"(?:\s+Velocity="([0-9.]+)")?/gi;
+        let ntMatch: RegExpExecArray | null;
 
-        notes.push({
-          id: `als_n_${notes.length + 1}`,
-          pitch: key,
-          startBar: parseFloat(startBar.toFixed(3)),
-          durationBars: parseFloat(durationBars.toFixed(3)),
-          velocity: vel,
-        });
+        while ((ntMatch = noteTagRegex.exec(notesXml)) !== null) {
+          const timeBeats = parseFloat(ntMatch[1]);
+          const durBeats = parseFloat(ntMatch[2]);
+          const vel = ntMatch[3] ? Math.round(parseFloat(ntMatch[3])) : 100;
+          const startBar = 1.0 + (timeBeats / 4.0);
+          const durationBars = Math.max(0.125, durBeats / 4.0);
+
+          notes.push({
+            id: `als_n_${notes.length + 1}`,
+            pitch: key,
+            startBar: parseFloat(startBar.toFixed(3)),
+            durationBars: parseFloat(durationBars.toFixed(3)),
+            velocity: vel,
+          });
+        }
+      }
+
+      // Pattern B: Direct MidiNote tags with Key attribute
+      if (notes.length === 0) {
+        const noteRegex = /<MidiNote\s+[^>]*Time="([0-9.]+)"\s+Duration="([0-9.]+)"\s+Key="([0-9]+)"(?:\s+Velocity="([0-9.]+)")?/gi;
+        let noteMatch: RegExpExecArray | null;
+
+        while ((noteMatch = noteRegex.exec(trackXml)) !== null) {
+          const timeBeats = parseFloat(noteMatch[1]);
+          const durBeats = parseFloat(noteMatch[2]);
+          const key = parseInt(noteMatch[3], 10);
+          const vel = noteMatch[4] ? Math.round(parseFloat(noteMatch[4])) : 100;
+
+          const startBar = 1.0 + (timeBeats / 4.0);
+          const durationBars = durBeats / 4.0;
+
+          notes.push({
+            id: `als_n_${notes.length + 1}`,
+            pitch: key,
+            startBar: parseFloat(startBar.toFixed(3)),
+            durationBars: parseFloat(durationBars.toFixed(3)),
+            velocity: vel,
+          });
+        }
       }
 
       if (notes.length > 0) {

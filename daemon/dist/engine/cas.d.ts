@@ -27,6 +27,10 @@ export declare class ContentAddressableStorage {
      */
     storeFile(sourceFilePath: string): Promise<StoredBlob>;
     /**
+     * Store a raw Buffer directly in Content-Addressable Storage.
+     */
+    storeBuffer(buf: Buffer): StoredBlob;
+    /**
      * Retrieve the absolute path of a stored blob by its hash.
      */
     getBlobPath(hash: string): string | null;

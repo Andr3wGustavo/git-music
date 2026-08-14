@@ -12,18 +12,21 @@ import {
   GitPullRequest,
   Music,
   Radio,
+  Award,
 } from 'lucide-react';
 
 interface HeaderProps {
   onOpenCommitModal: () => void;
   onOpenBranchModal: () => void;
   onOpenPullRequestModal: () => void;
+  onOpenSplitSheetModal: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenCommitModal,
   onOpenBranchModal,
   onOpenPullRequestModal,
+  onOpenSplitSheetModal,
 }) => {
   const {
     projectState,
@@ -156,8 +159,17 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Right: Cloud Sync, Pull Requests & Commit Button */}
-      <div className="flex items-center space-x-3">
+      {/* Right: Split Sheet, Cloud Sync, Pull Requests & Commit Button */}
+      <div className="flex items-center space-x-2.5">
+        {/* Split Sheet Modal Button */}
+        <button
+          onClick={onOpenSplitSheetModal}
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500/40 text-xs font-medium text-amber-300 transition-all shadow-sm"
+        >
+          <Award className="w-3.5 h-3.5 text-amber-400" />
+          <span>Split Sheet</span>
+        </button>
+
         {/* Cloud CAS Sync Button */}
         <button
           onClick={handleCloudSync}
@@ -166,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Cloud className={`w-3.5 h-3.5 text-cyan-400 ${isSyncing ? 'animate-spin' : ''}`} />
           <span className="font-mono text-[11px]">
-            {isSyncing ? 'Syncing to R2...' : 'R2 CAS Synced'}
+            {isSyncing ? 'Syncing...' : 'R2 Synced'}
           </span>
         </button>
 

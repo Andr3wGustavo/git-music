@@ -11,12 +11,14 @@ import { CommitModal } from './components/CommitModal';
 import { BranchModal } from './components/BranchModal';
 import { CommentModal } from './components/CommentModal';
 import { PullRequestModal } from './components/PullRequestModal';
+import { SplitSheetModal } from './components/SplitSheetModal';
 
 const StudioCockpit: React.FC = () => {
   const { activeView } = useIPC();
   const [isCommitModalOpen, setIsCommitModalOpen] = useState(false);
   const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
   const [isPullRequestModalOpen, setIsPullRequestModalOpen] = useState(false);
+  const [isSplitSheetModalOpen, setIsSplitSheetModalOpen] = useState(false);
   const [commentModalState, setCommentModalState] = useState<{ isOpen: boolean; barPosition: number }>({
     isOpen: false,
     barPosition: 1.0,
@@ -33,6 +35,7 @@ const StudioCockpit: React.FC = () => {
         onOpenCommitModal={() => setIsCommitModalOpen(true)}
         onOpenBranchModal={() => setIsBranchModalOpen(true)}
         onOpenPullRequestModal={() => setIsPullRequestModalOpen(true)}
+        onOpenSplitSheetModal={() => setIsSplitSheetModalOpen(true)}
       />
 
       {/* Main Workspace Layout */}
@@ -83,6 +86,10 @@ const StudioCockpit: React.FC = () => {
       <PullRequestModal
         isOpen={isPullRequestModalOpen}
         onClose={() => setIsPullRequestModalOpen(false)}
+      />
+      <SplitSheetModal
+        isOpen={isSplitSheetModalOpen}
+        onClose={() => setIsSplitSheetModalOpen(false)}
       />
     </div>
   );
