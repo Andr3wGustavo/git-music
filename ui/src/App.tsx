@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { IPCProvider, useIPC } from './context/IPCContext';
+import { IPCProvider } from './context/IPCContext';
+import { CompactPluginHUD } from './components/CompactPluginHUD';
+import { Maximize2, Minimize2 } from 'lucide-react';
 import { Header } from './components/Header';
 import { TransportBar } from './components/TransportBar';
 import { WaveformVisualizer } from './components/WaveformVisualizer';
@@ -14,9 +16,12 @@ import { CommentModal } from './components/CommentModal';
 import { PullRequestModal } from './components/PullRequestModal';
 import { SplitSheetModal } from './components/SplitSheetModal';
 import { AIMixCopilot } from './components/AIMixCopilot';
+import { useIPC } from './context/IPCContext';
 
-const StudioCockpit: React.FC = () => {
+const StudioAppContent: React.FC = () => {
+  const [isExpandedMode, setIsExpandedMode] = useState(false);
   const { activeView } = useIPC();
+
   const [isCommitModalOpen, setIsCommitModalOpen] = useState(false);
   const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
   const [isPullRequestModalOpen, setIsPullRequestModalOpen] = useState(false);
@@ -32,80 +37,93 @@ const StudioCockpit: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#06080e] via-[#0a0e18] to-[#06080e] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Top Studio Header */}
-      <Header
-        onOpenCommitModal={() => setIsCommitModalOpen(true)}
-        onOpenBranchModal={() => setIsBranchModalOpen(true)}
-        onOpenPullRequestModal={() => setIsPullRequestModalOpen(true)}
-        onOpenSplitSheetModal={() => setIsSplitSheetModalOpen(true)}
-        onToggleAICopilot={() => setIsAICopilotOpen(!isAICopilotOpen)}
-        isAICopilotOpen={isAICopilotOpen}
-      />
-
-      {/* Main Workspace Layout */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
-        {/* Real-time DAW Transport & A/B Switcher with Stereo VU Meters */}
-        <TransportBar />
-
-        {/* Dynamic Studio Visualizer: Waveform vs Piano Roll */}
-        <div className="transition-all duration-300 space-y-4">
-          {activeView === 'waveform' ? (
-            <div className="space-y-4">
-              <WaveformVisualizer onAddCommentAtBar={handleAddCommentAtBar} />
-              {/* Real-Time 60 FPS Stereo FFT Spectrum Analyzer */}
-              <SpectrumAnalyzer />
-            </div>
+    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
+      {/* Top Floating Mini Bar to switch to Full Studio if needed */}
+      <div className="w-full max-w-[460px] flex items-center justify-between text-[11px] font-mono text-slate-500 mb-2 px-1">
+        <span className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+          FL Studio 21 Connected
+        </span>
+        <button
+          onClick={() => setIsExpandedMode(!isExpandedMode)}
+          className="flex items-center space-x-1 hover:text-cyan-400 transition-colors"
+        >
+          {isExpandedMode ? (
+            <>
+              <Minimize2 className="w-3.5 h-3.5" />
+              <span>Modo VST Compacto</span>
+            </>
           ) : (
-            <div className="h-[480px]">
-              <PianoRollDiff />
-            </div>
+            <>
+              <Maximize2 className="w-3.5 h-3.5" />
+              <span>Expandir Studio Pro</span>
+            </>
           )}
-        </div>
+        </button>
+      </div>
 
-        {/* 2-Column Grid: Left (Timeline & Stems), Right (Feedback & Stems) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left 7 Columns: Commit History & Branches */}
-          <div className="lg:col-span-7 space-y-6">
-            <CommitTimeline />
+      {/* Main View: Default is the Minimalist Hardware VST Rack */}
+      {!isExpandedMode ? (
+        <CompactPluginHUD />
+      ) : (
+        <div className="w-full max-w-7xl space-y-6">
+          <Header
+            onOpenCommitModal={() => setIsCommitModalOpen(true)}
+            onOpenBranchModal={() => setIsBranchModalOpen(true)}
+            onOpenPullRequestModal={() => setIsPullRequestModalOpen(true)}
+            onOpenSplitSheetModal={() => setIsSplitSheetModalOpen(true)}
+            onToggleAICopilot={() => setIsAICopilotOpen(!isAICopilotOpen)}
+            isAICopilotOpen={isAICopilotOpen}
+          />
+          <TransportBar />
+          <div className="transition-all duration-300 space-y-4">
+            {activeView === 'waveform' ? (
+              <div className="space-y-4">
+                <WaveformVisualizer onAddCommentAtBar={handleAddCommentAtBar} />
+                <SpectrumAnalyzer />
+              </div>
+            ) : (
+              <div className="h-[480px]">
+                <PianoRollDiff />
+              </div>
+            )}
           </div>
-
-          {/* Right 5 Columns: Stem Inventory & Audio Comments */}
-          <div className="lg:col-span-5 space-y-6">
-            <StemList />
-            <AudioCommentsList onOpenNewCommentModal={() => handleAddCommentAtBar(16.0)} />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-7 space-y-6">
+              <CommitTimeline />
+            </div>
+            <div className="lg:col-span-5 space-y-6">
+              <StemList />
+              <AudioCommentsList onOpenNewCommentModal={() => handleAddCommentAtBar(16.0)} />
+            </div>
           </div>
+          <AIMixCopilot
+            isOpen={isAICopilotOpen}
+            onClose={() => setIsAICopilotOpen(false)}
+          />
+          <CommitModal
+            isOpen={isCommitModalOpen}
+            onClose={() => setIsCommitModalOpen(false)}
+          />
+          <BranchModal
+            isOpen={isBranchModalOpen}
+            onClose={() => setIsBranchModalOpen(false)}
+          />
+          <CommentModal
+            isOpen={commentModalState.isOpen}
+            barPosition={commentModalState.barPosition}
+            onClose={() => setCommentModalState({ isOpen: false, barPosition: 1.0 })}
+          />
+          <PullRequestModal
+            isOpen={isPullRequestModalOpen}
+            onClose={() => setIsPullRequestModalOpen(false)}
+          />
+          <SplitSheetModal
+            isOpen={isSplitSheetModalOpen}
+            onClose={() => setIsSplitSheetModalOpen(false)}
+          />
         </div>
-      </main>
-
-      {/* Slide-Over AI Mix Copilot */}
-      <AIMixCopilot
-        isOpen={isAICopilotOpen}
-        onClose={() => setIsAICopilotOpen(false)}
-      />
-
-      {/* Modals */}
-      <CommitModal
-        isOpen={isCommitModalOpen}
-        onClose={() => setIsCommitModalOpen(false)}
-      />
-      <BranchModal
-        isOpen={isBranchModalOpen}
-        onClose={() => setIsBranchModalOpen(false)}
-      />
-      <CommentModal
-        isOpen={commentModalState.isOpen}
-        barPosition={commentModalState.barPosition}
-        onClose={() => setCommentModalState({ isOpen: false, barPosition: 1.0 })}
-      />
-      <PullRequestModal
-        isOpen={isPullRequestModalOpen}
-        onClose={() => setIsPullRequestModalOpen(false)}
-      />
-      <SplitSheetModal
-        isOpen={isSplitSheetModalOpen}
-        onClose={() => setIsSplitSheetModalOpen(false)}
-      />
+      )}
     </div>
   );
 };
@@ -113,7 +131,7 @@ const StudioCockpit: React.FC = () => {
 export function App() {
   return (
     <IPCProvider>
-      <StudioCockpit />
+      <StudioAppContent />
     </IPCProvider>
   );
 }

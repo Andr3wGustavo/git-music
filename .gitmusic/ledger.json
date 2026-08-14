@@ -1,0 +1,152 @@
+{
+  "projectName": "Cyberpunk Bassline (Drop Project)",
+  "currentBranch": "main",
+  "branches": {
+    "main": "1e85b0a27c48",
+    "feat/guitar-solo-take3": "1e85b0a27c48",
+    "mix-master-loudness": "1e85b0a27c48"
+  },
+  "commits": {
+    "0ea5c1e6fa17": {
+      "hash": "0ea5c1e6fa17",
+      "parentHash": null,
+      "branch": "main",
+      "message": "feat(init): Initial arrangement structure and 808 sub-bass setup",
+      "author": "Alex (Lead Producer)",
+      "timestamp": "2026-08-14T16:36:43.027Z",
+      "dawProject": {
+        "fileName": "Cyberpunk_Bassline_v1.flp",
+        "fileHash": "flp_hash_001",
+        "dawType": "flp",
+        "bpm": 128
+      },
+      "stems": [
+        {
+          "id": "stem_kick",
+          "name": "01_Kick_808_Punch.wav",
+          "relativePath": "Audio/Stems/01_Kick_808_Punch.wav",
+          "sizeBytes": 14500000,
+          "hash": "a1b2c3d4e5f601",
+          "durationSeconds": 180,
+          "sampleRate": 44100,
+          "channels": 2
+        },
+        {
+          "id": "stem_bass",
+          "name": "02_Serum_ReeseBass_Drop.wav",
+          "relativePath": "Audio/Stems/02_Serum_ReeseBass_Drop.wav",
+          "sizeBytes": 28200000,
+          "hash": "f9e8d7c6b5a402",
+          "durationSeconds": 180,
+          "sampleRate": 44100,
+          "channels": 2,
+          "missingPlugin": "Xfer Serum v1.36b",
+          "isFrozen": true
+        },
+        {
+          "id": "stem_synth",
+          "name": "03_Lead_CyberArp_Sidechained.wav",
+          "relativePath": "Audio/Stems/03_Lead_CyberArp_Sidechained.wav",
+          "sizeBytes": 22100000,
+          "hash": "778899aabbcc03",
+          "durationSeconds": 180,
+          "sampleRate": 44100,
+          "channels": 2
+        },
+        {
+          "id": "stem_vox",
+          "name": "04_VocalHook_Tuned_Take2.wav",
+          "relativePath": "Audio/Stems/04_VocalHook_Tuned_Take2.wav",
+          "sizeBytes": 19400000,
+          "hash": "11223344556604",
+          "durationSeconds": 180,
+          "sampleRate": 44100,
+          "channels": 2
+        }
+      ],
+      "comments": [],
+      "totalSizeBytes": 84200000,
+      "dedupSavedBytes": 0
+    },
+    "1e85b0a27c48": {
+      "hash": "1e85b0a27c48",
+      "parentHash": "0ea5c1e6fa17",
+      "branch": "main",
+      "message": "mix(vocals): Apply FabFilter Pro-Q3 cut & Melodyne pitch correction on hook",
+      "author": "Sarah (Vocalist & Mix)",
+      "timestamp": "2026-08-14T16:36:43.053Z",
+      "dawProject": {
+        "fileName": "Cyberpunk_Bassline_v2.flp",
+        "fileHash": "flp_hash_002",
+        "dawType": "flp",
+        "bpm": 128
+      },
+      "stems": [
+        {
+          "id": "stem_kick",
+          "name": "01_Kick_808_Punch.wav",
+          "relativePath": "Audio/Stems/01_Kick_808_Punch.wav",
+          "sizeBytes": 14500000,
+          "hash": "a1b2c3d4e5f601",
+          "durationSeconds": 180,
+          "sampleRate": 44100,
+          "channels": 2
+        },
+        {
+          "id": "stem_bass",
+          "name": "02_Serum_ReeseBass_Drop.wav",
+          "relativePath": "Audio/Stems/02_Serum_ReeseBass_Drop.wav",
+          "sizeBytes": 28200000,
+          "hash": "f9e8d7c6b5a402",
+          "durationSeconds": 180,
+          "sampleRate": 44100,
+          "channels": 2,
+          "missingPlugin": "Xfer Serum v1.36b",
+          "isFrozen": true
+        },
+        {
+          "id": "stem_synth",
+          "name": "03_Lead_CyberArp_Sidechained.wav",
+          "relativePath": "Audio/Stems/03_Lead_CyberArp_Sidechained.wav",
+          "sizeBytes": 22100000,
+          "hash": "778899aabbcc03",
+          "durationSeconds": 180,
+          "sampleRate": 44100,
+          "channels": 2
+        },
+        {
+          "id": "stem_vox",
+          "name": "04_VocalHook_Autotune_Cleaned.wav",
+          "relativePath": "Audio/Stems/04_VocalHook_Autotune_Cleaned.wav",
+          "sizeBytes": 19800000,
+          "hash": "99aa88bb77cc05",
+          "durationSeconds": 180,
+          "sampleRate": 44100,
+          "channels": 2
+        }
+      ],
+      "comments": [
+        {
+          "id": "c1",
+          "author": "Sarah (Vocalist & Mix)",
+          "timestampSeconds": 45.5,
+          "barPosition": 16.2,
+          "message": "Ajustei o de-esser no refrão para tirar a sibilância do microfone Neumann!",
+          "createdAt": "2026-08-14T15:36:43.052Z",
+          "resolved": false
+        },
+        {
+          "id": "c2",
+          "author": "Alex (Lead Producer)",
+          "timestampSeconds": 64,
+          "barPosition": 32,
+          "message": "O drop no compasso 32 está monstruoso 🔥. Vamos testar uma versão com solo de guitarra?",
+          "createdAt": "2026-08-14T16:06:43.053Z",
+          "resolved": false
+        }
+      ],
+      "totalSizeBytes": 84600000,
+      "dedupSavedBytes": 64800000
+    }
+  }
+}
