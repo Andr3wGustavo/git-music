@@ -4,79 +4,61 @@
 
 @layer base {
   body {
-    background-color: #080b11;
-    color: #e2e8f0;
-    font-family: 'Outfit', sans-serif;
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'JetBrains Mono', monospace;
   }
 }
 
-/* Custom Studio Glassmorphism */
-.glass-panel {
-  background: rgba(17, 23, 38, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(36, 48, 76, 0.6);
+/* Sharp Square Minimalist Hardware Panels */
+.hardware-panel {
+  background: #050505;
+  border: 1px solid #1a1a1a;
+  border-radius: 0px;
 }
 
-.glass-panel-hover {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.glass-panel-hover:hover {
-  background: rgba(22, 30, 49, 0.9);
-  border-color: rgba(0, 242, 254, 0.4);
-  box-shadow: 0 8px 32px rgba(0, 242, 254, 0.1);
+.hardware-panel-hover:hover {
+  border-color: #FF5500;
 }
 
-.neon-glow-cyan {
-  box-shadow: 0 0 15px rgba(0, 242, 254, 0.35);
-}
-
-.neon-glow-pink {
-  box-shadow: 0 0 15px rgba(255, 0, 127, 0.35);
-}
-
-.neon-glow-green {
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.35);
-}
-
-/* Custom Studio Range / Crossfader Slider */
+/* Industrial Square Sliders */
 input[type="range"] {
   -webkit-appearance: none;
-  background: #1c263c;
-  border-radius: 9999px;
-  height: 6px;
+  background: #141414;
+  border-radius: 0px;
+  height: 4px;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 18px;
-  width: 18px;
-  border-radius: 50%;
-  background: #00f2fe;
+  height: 12px;
+  width: 12px;
+  border-radius: 0px;
+  background: #FF5500;
   cursor: pointer;
-  box-shadow: 0 0 10px #00f2fe;
-  transition: transform 0.1s ease;
+  border: 1px solid #000000;
+  transition: none;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
+  background: #ff6600;
 }
 
-/* Studio Scrollbars */
+/* Minimalist Studio Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0d121d;
+  background: #000000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #24304c;
-  border-radius: 4px;
+  background: #262626;
+  border-radius: 0px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b4d75;
+  background: #FF5500;
 }

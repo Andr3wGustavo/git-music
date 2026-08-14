@@ -1,123 +1,129 @@
-# Git-Music
+# 🎛️ Git-Music
 
-Native In-DAW Version Control, Real-Time Collaboration, and Visual Audio/MIDI Diff System for Music Producers (FL Studio, Ableton Live, Reaper, Logic Pro).
-
----
-
-## 1. Overview
-
-**Git-Music** is a specialized version control and collaboration platform designed specifically for audio production workflows. By combining a native C++20 VST3/CLAP audio plugin with an intelligent background daemon and a modern in-DAW studio cockpit, Git-Music enables music producers, audio engineers, and sound designers to:
-
-* **Create Instant Commits & Branches:** Snapshot projects with cryptographically verified Content-Addressable Storage (CAS) that deduplicates unchanged audio stems, saving up to 80% in storage.
-* **Inspect Multi-Track Audio Waveform Diffs:** Graphically compare stems between commits, branches, and versions with transient overlays.
-* **Inspect Visual MIDI / Piano Roll Diffs:** Visually inspect melodic and harmonic alterations between commits (🟩 Added notes, 🟥 Deleted notes, 🟨 Modified pitch/velocity/duration) with automated harmonic conflict & dissonance detection.
-* **Parse DAW Project Files Natively:** Automatic deep inspection of FL Studio (`.flp`), Ableton Live (`.als`), and Reaper (`.rpp`) project binaries to extract tempo, track hierarchies, plugin inventories, and sample dependencies.
-* **Streamline Cloud Collaboration:** Zero-egress CAS chunk synchronization over Cloudflare R2 / AWS S3 and 3-way stem pull requests with automated LUFS gain balancing and spectral collision alerts.
-* **Zero-Allocation In-DAW Audio Processing:** Lock-free SPSC ring buffers ensure the real-time audio thread never drops a buffer or glitches during snapshot switches.
+**Native In-DAW Version Control, Real-Time Audio Diff & Producer Collaboration System for FL Studio 21, Ableton Live, and Reaper.**
 
 ---
 
-## 2. Quick Start (1-Click Windows Startup)
+## 📸 Interface Preview (FL Studio 21 In-DAW VST3)
 
-To instantly launch the Git-Music ecosystem on Windows:
+<!-- ============================================================================== -->
+<!-- PLACE YOUR APP SCREENSHOT BELOW: Save your screenshot as docs/images/git-music-flstudio-vst.png -->
+<!-- ============================================================================== -->
 
-```cmd
-# Double click or run in terminal:
-start-git-music.bat
+<div align="center">
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🎛️ [X] GIT-MUSIC VST3                       [ R2 CLOUD ] [X]│
+├─────────────────────────────────────────────────────────────┤
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🟢 FL STUDIO 21 CONNECTED          128.0 BPM • 4/4      │ │
+│ │ BRANCH: [ main / feat-synth-drop ]        SSD: 64% CAS  │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ 📸 SALVAR SNAPSHOT                                          │
+│ ┌──────────────────────────────────────┬──────────────────┐ │
+│ │ Descreva a alteração no beat...      │ 📸 [ SALVAR ]    │ │
+│ └──────────────────────────────────────┴──────────────────┘ │
+│                                                             │
+│ 🎚️ A/B COMPARADOR DE ÁUDIO                      [ ▶ PLAY ] │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ L [ ■■■■■■■■■□□□ ] -6dB   R [ ■■■■■■■■■□□□ ] -6dB  Clip │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│ ┌───────────────────────────┬─────────────────────────────┐ │
+│ │ (A) FL LIVE MASTER        │ (B) SNAPSHOT [v2_mix]       │ │
+│ └───────────────────────────┴─────────────────────────────┘ │
+│  A (LIVE) ────────────●────────────── B (SNAP) (Crossfader) │
+│                                                             │
+│ ⏱️ HISTÓRICO DE VERSÕES (1-CLIQUE PARA OUVIR)               │
+│ • v3 (Agora)    - Lead Vocal Cleaned           [ ATUAL ]   │
+│ • v2 (15m atrás) - FabFilter Pro-Q3 Cut         [ OUVIR ]   │
+│ • v1 (Ontem)    - Initial Beat & Bassline       [ OUVIR ]   │
+│                                                             │
+│ [ 👥 PRODUTORES (2) ]   [ 🌿 BRANCHES ]   [ 🏆 ROYALTIES ]  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-This single command:
-1. Verifies your Node.js environment.
-2. Automatically installs any missing dependencies.
-3. Compiles the TypeScript daemon.
-4. Starts the background WebSocket IPC server on `ws://127.0.0.1:4848`.
-5. Starts the Vite Studio Cockpit and opens `http://localhost:5173` in your browser.
+*(Adicione a captura de tela real da janela em: `docs/images/git-music-flstudio-vst.png`)*
 
-To run the automated engine test suite:
-```cmd
-test-engine.bat
-# Or via npm:
+![Git-Music FL Studio 21 VST3 HUD](docs/images/git-music-flstudio-vst.png)
+
+</div>
+
+---
+
+## ⚡ 1-Click Quick Start (Windows)
+
+Para iniciar o ecossistema completo do Git-Music no Windows:
+
+```powershell
+# PowerShell (Recomendado):
+.\start-git-music.ps1
+
+# Ou no Prompt de Comando clássico (CMD):
+.\start-git-music.bat
+```
+
+Este comando:
+1. Verifica o ambiente Node.js.
+2. Compila o Daemon de sincronização em TypeScript.
+3. Inicia o servidor WebSocket local na porta `ws://127.0.0.1:4848`.
+4. Abre o **VST Studio HUD** no navegador em `http://localhost:3000`.
+
+Para rodar a suíte de 11 testes automatizados do motor:
+```powershell
+.\test-engine.ps1
+# ou:
 npm run test
 ```
 
 ---
 
-## 3. System Architecture
+## 🧠 Principais Funcionalidades
 
-```
-+-------------------------------------------------------------+
-|  DAW Host (FL Studio, Ableton Live, Reaper, Logic Pro)      |
-|                                                             |
-|  +-------------------------------------------------------+  |
-|  |  Git-Music Audio Plugin (C++ VST3 / CLAP / AU)        |  |
-|  |  - Real-time Audio Callback (processBlock)            |  |
-|  |  - Lock-Free SPSC Ring Buffer for Event Queueing      |  |
-|  |  - Equal-Power A/B Audio Comparison Crossfader        |  |
-|  |  - Embedded Studio Cockpit View                       |  |
-|  +--------------------------+----------------------------+  |
-+-----------------------------|-------------------------------+
-                              | IPC (WebSocket on ws://127.0.0.1:4848)
-+-----------------------------v-------------------------------+
-|  Git-Music Local Engine Daemon (Node.js / TypeScript Core)  |
-|  - Native FL Studio (.flp) Binary Chunk Parser              |
-|  - Native Ableton Live (.als) In-Memory Gzip/XML Parser      |
-|  - Native Reaper (.rpp) Declarative Text Parser             |
-|  - Content-Addressable Storage (CAS with SHA-256 FastCDC)   |
-|  - Commit Ledger, Snapshot Manifests, and Branch History    |
-|  - 3-Way Stem Merge & Spectral Masking Warning Engine       |
-+-----------------------------+-------------------------------+
-                              | Zero-Egress Storage Pipeline
-+-----------------------------v-------------------------------+
-|  Git-Music Cloud Hub (Cloudflare R2 / AWS S3)               |
-|  - Cryptographic Chunk Deduplication & Delta Sync           |
-|  - Multi-Producer Stem Pull Requests & Branch Merging        |
-+-------------------------------------------------------------+
-```
+### 1. 🎛️ VST3 Nativo In-DAW (FL Studio 21)
+* Abre como um plugin de efeito direto no Master Mixer do FL Studio.
+* Contêiner nativo C++20 com aceleração de GPU (DirectX/WebView2) sem janelas soltas.
+* Fila de memória sem travas (*Lock-Free SPSC Ring Buffer*) para garantir **zero cliques ou engasgos** no motor de áudio.
+
+### 2. 📸 Snapshots com Deduplicação Inteligente (CAS)
+* Salva novas versões do projeto com 1 clique (ou atalho `Enter`).
+* O sistema calcula o hash SHA-256 e armazena **apenas as faixas que foram alteradas**, economizando até **80% de espaço no SSD**.
+
+### 3. 🎚️ A/B Comparison Switcher em Tempo Real
+* Compare instantaneamente o que você está ouvindo no FL Studio agora (`Canal A`) com qualquer versão anterior salva (`Canal B`).
+* Crossfader de potência constante com filtros DSP para conferência crítica de mixagem e masterização.
+
+### 4. 👥 Conexão Direta Entre Produtores
+* Painel minimalista indicando colaboradores ativos no projeto.
+* Sincronização zero-egress na nuvem (Cloudflare R2 / AWS S3) para envio e download rápido de stems.
+
+### 5. 🎼 Compilador Cross-DAW (Music-IR)
+* Traduz automaticamente arranjos entre **FL Studio (`.flp`)**, **Ableton Live (`.als`)** e **Cockos Reaper (`.rpp`)**.
+
+### 6. ⚖️ Split Sheets Criptográficas & Direitos Autorais
+* Geração automática de certificados de autoria com assinatura **Ed25519** e carimbo de tempo TSA (RFC 3161), com exportação de contratos PDF em 1 clique.
 
 ---
 
-## 4. Core Technical Modules
+## 📁 Estrutura do Repositório
 
-### 4.1 Native DAW Project Parsers (`daemon/src/parsers/`)
-* **FL Studio Binary Parser (`flpParser.ts`):** Decodes raw binary byte, word, dword, and text/chunk events (`FLhd`, `FLdt`, fine tempo, channel rack plugins, audio samples, and pattern note tuples).
-* **Ableton Live Gzip Parser (`alsParser.ts`):** Unpacks compressed streams in-memory with Node `zlib`, extracting device chains, VST plugin descriptors, audio sample references, and MIDI clip notes.
-* **Reaper Parser (`rppParser.ts`):** Parses Cockos Reaper hierarchical text AST documents and FX chains.
-* **Unified Project Inspector (`inspector.ts`):** Unified router that analyzes any incoming DAW session format.
-
-### 4.2 Local Engine & CAS (`daemon/src/engine/`)
-* **Content-Addressable Storage (`cas.ts`):** 2-level directory sharded object store (`.gitmusic/objects/ab/cdef...`) with cryptographic SHA-256 chunk deduplication.
-* **Ledger Engine (`ledger.ts`):** Commit DAG manager tracking branches, snapshots, parent references, and timecoded mixing notes.
-* **Project Watcher (`watcher.ts`):** Real-time debounce file system watcher for project files and audio recordings.
-
-### 4.3 Cloud Collaboration & Merge Engine (`daemon/src/cloud/`)
-* **Cloud CAS Gateway (`cloudSync.ts`):** Zero-egress synchronization with Cloudflare R2 / AWS S3, calculating delta payloads between local CAS and remote storage.
-* **Stem Merge Engine (`mergeEngine.ts`):** 3-way stem reconciliation with automated LUFS gain staging and spectral collision warnings (e.g. 40Hz–100Hz kick vs. sub-bass phase masking).
-
-### 4.4 In-DAW Studio Cockpit (`ui/src/`)
-* **Waveform Diff Visualizer (`WaveformVisualizer.tsx`):** Canvas-based multi-track stem visualizer with transient markers and pin notes.
-* **Visual MIDI Diff Piano Roll (`PianoRollDiff.tsx`):** Interactive piano roll inspector displaying note additions, deletions, velocity changes, and key/scale dissonance alerts.
-* **Stem Pull Request Modal (`PullRequestModal.tsx`):** In-DAW PR review modal with 1-click branch stem merging.
-
----
-
-## 5. Development & Testing
-
-```bash
-# Run all automated unit and integration tests (100% green)
-npm run test
-
-# Build daemon and UI production packages
-npm run build:all
-
-# Start daemon in watch mode
-npm run dev:daemon
-
-# Start UI in Vite dev mode
-npm run dev:ui
 ```
-
----
-
-## 6. License
-
-This project is licensed under the MIT License.
+git-music/
+├── daemon/               # Motor de sincronização em segundo plano (Node.js/TypeScript)
+│   ├── src/ai/           # Bridge de separação de stems por IA (Demucs)
+│   ├── src/engine/       # CAS (Content-Addressable Storage), DAG Ledger e Auto-Freezer
+│   ├── src/parsers/      # Decodificadores binários nativos de .flp, .als, .rpp e Music-IR
+│   └── src/legal/        # Gerador de Split Sheets com prova criptográfica Ed25519
+├── plugin/               # Código C++20 nativo do Plugin VST3/CLAP com WebView2
+│   ├── include/          # Headers (RingBuffer, DSP Processor, WebViewContainer)
+│   └── src/              # Implementação DSP e janela nativa HWND
+├── ui/                   # Interface Minimalista Pure Black & Square VST HUD (React/Vite/Tailwind)
+│   ├── src/components/   # CompactPluginHUD, VUMeter, PianoRollDiff, SplitSheetModal
+│   └── src/audio/        # Motor Web Audio API e analisador FFT de 60 FPS
+├── docs/                 # Documentação e imagens de demonstração
+│   └── images/           # Espaço para prints e capturas de tela do plugin
+├── start-git-music.ps1   # Launcher 1-Click para PowerShell
+├── start-git-music.bat   # Launcher 1-Click para CMD
+└── test-engine.ps1       # Test Runner 1-Click
+```
