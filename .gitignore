@@ -1,0 +1,23 @@
+# Node / Web
+node_modules/
+dist/
+.vite/
+build/
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+*.log
+
+# C++ Build Artefacts
+plugin/build/
+*.obj
+*.o
+*.lib
+*.a
+*.exp
+*.ilk
+*.pdb
+
+# Local Session State
+.gitmusic/objects/

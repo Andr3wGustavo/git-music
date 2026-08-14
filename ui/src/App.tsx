@@ -1,0 +1,82 @@
+import React, { useState } from 'react';
+import { IPCProvider } from './context/IPCContext';
+import { Header } from './components/Header';
+import { TransportBar } from './components/TransportBar';
+import { WaveformVisualizer } from './components/WaveformVisualizer';
+import { CommitTimeline } from './components/CommitTimeline';
+import { StemList } from './components/StemList';
+import { AudioCommentsList } from './components/AudioCommentsList';
+import { CommitModal } from './components/CommitModal';
+import { BranchModal } from './components/BranchModal';
+import { CommentModal } from './components/CommentModal';
+
+const StudioCockpit: React.FC = () => {
+  const [isCommitModalOpen, setIsCommitModalOpen] = useState(false);
+  const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
+  const [commentModalState, setCommentModalState] = useState<{ isOpen: boolean; barPosition: number }>({
+    isOpen: false,
+    barPosition: 1.0,
+  });
+
+  const handleAddCommentAtBar = (bar: number) => {
+    setCommentModalState({ isOpen: true, barPosition: bar });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#080b11] via-[#0c101a] to-[#080b11] text-slate-100 flex flex-col">
+      {/* Top Studio Header */}
+      <Header
+        onOpenCommitModal={() => setIsCommitModalOpen(true)}
+        onOpenBranchModal={() => setIsBranchModalOpen(true)}
+      />
+
+      {/* Main Workspace Layout */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+        {/* Real-time DAW Transport & A/B Switcher */}
+        <TransportBar />
+
+        {/* Multi-Stem Interactive Waveform Visualizer */}
+        <WaveformVisualizer onAddCommentAtBar={handleAddCommentAtBar} />
+
+        {/* 2-Column Grid: Left (Timeline & Stems), Right (Feedback & Stems) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left 7 Columns: Commit History & Branches */}
+          <div className="lg:col-span-7 space-y-6">
+            <CommitTimeline />
+          </div>
+
+          {/* Right 5 Columns: Stem Inventory & Audio Comments */}
+          <div className="lg:col-span-5 space-y-6">
+            <StemList />
+            <AudioCommentsList onOpenNewCommentModal={() => handleAddCommentAtBar(16.0)} />
+          </div>
+        </div>
+      </main>
+
+      {/* Modals */}
+      <CommitModal
+        isOpen={isCommitModalOpen}
+        onClose={() => setIsCommitModalOpen(false)}
+      />
+      <BranchModal
+        isOpen={isBranchModalOpen}
+        onClose={() => setIsBranchModalOpen(false)}
+      />
+      <CommentModal
+        isOpen={commentModalState.isOpen}
+        barPosition={commentModalState.barPosition}
+        onClose={() => setCommentModalState({ isOpen: false, barPosition: 1.0 })}
+      />
+    </div>
+  );
+};
+
+export function App() {
+  return (
+    <IPCProvider>
+      <StudioCockpit />
+    </IPCProvider>
+  );
+}
+
+export default App;

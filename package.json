@@ -1,0 +1,24 @@
+{
+  "name": "git-music",
+  "version": "0.1.0",
+  "description": "In-DAW Version Control & Collaboration System for Music Producers",
+  "scripts": {
+    "dev:daemon": "npm --prefix daemon run dev",
+    "dev:ui": "npm --prefix ui run dev",
+    "build:daemon": "npm --prefix daemon run build",
+    "build:ui": "npm --prefix ui run build",
+    "build:all": "npm run build:daemon && npm run build:ui",
+    "start:daemon": "node daemon/dist/index.js"
+  },
+  "keywords": [
+    "git",
+    "music",
+    "daw",
+    "vst3",
+    "fl-studio",
+    "ableton",
+    "audio-collaboration"
+  ],
+  "author": "Git-Music Core Team",
+  "license": "MIT"
+}
