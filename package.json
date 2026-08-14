@@ -8,7 +8,8 @@
     "build:daemon": "npm --prefix daemon run build",
     "build:ui": "npm --prefix ui run build",
     "build:all": "npm run build:daemon && npm run build:ui",
-    "start:daemon": "node daemon/dist/index.js"
+    "start:daemon": "node daemon/dist/index.js",
+    "test": "npm --prefix daemon run test"
   },
   "keywords": [
     "git",

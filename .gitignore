@@ -30,4 +30,6 @@ plugin/build/
 # Local Session State & Cached Objects
 .gitmusic/objects/
 **/.gitmusic/objects/
+.test_sandbox/
+**/.test_sandbox/
 
