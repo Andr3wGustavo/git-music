@@ -54,7 +54,7 @@ echo [4/4] Starting Git-Music Engine and In-DAW Studio Cockpit...
 echo.
 echo ==============================================================================
 echo   [OK] WebSocket IPC Server starting on: ws://127.0.0.1:4848
-echo   [OK] Studio Web Cockpit opening at:    http://localhost:5173
+echo   [OK] Studio Web Cockpit opening at:    http://localhost:3000
 echo ==============================================================================
 echo.
 
@@ -63,7 +63,7 @@ start "Git-Music Daemon Server" cmd /k "npm --prefix daemon run start"
 
 REM Open Browser to Vite Dev Server
 timeout /t 2 /nobreak >nul
-start http://localhost:5173
+start http://localhost:3000
 
 REM Start UI Vite Server in the main window
 cd ui

@@ -41,7 +41,7 @@ Write-Host "[4/4] Starting Git-Music Engine and In-DAW Studio Cockpit..." -Foreg
 Write-Host ""
 Write-Host "==============================================================================" -ForegroundColor Green
 Write-Host "  [OK] WebSocket IPC Server starting on: ws://127.0.0.1:4848" -ForegroundColor White
-Write-Host "  [OK] Studio Web Cockpit opening at:    http://localhost:5173" -ForegroundColor White
+Write-Host "  [OK] Studio Web Cockpit opening at:    http://localhost:3000" -ForegroundColor White
 Write-Host "==============================================================================" -ForegroundColor Green
 Write-Host ""
 
@@ -50,7 +50,7 @@ Start-Process cmd.exe -ArgumentList '/k "npm --prefix daemon run start"'
 
 # Open Browser to Vite Dev Server
 Start-Sleep -Seconds 2
-Start-Process "http://localhost:5173"
+Start-Process "http://localhost:3000"
 
 # Start UI Vite Server in the main PowerShell window
 Set-Location ui
