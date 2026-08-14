@@ -1,16 +1,24 @@
-# Node / Web
+# Node / Web (Root & Monorepo Subpackages)
 node_modules/
+**/node_modules/
 dist/
+**/dist/
 .vite/
+**/.vite/
 build/
+**/build/
+package-lock.json
 
 # IDE & OS
 .DS_Store
 Thumbs.db
 *.log
+.vscode/
+.idea/
 
 # C++ Build Artefacts
 plugin/build/
+**/plugin/build/
 *.obj
 *.o
 *.lib
@@ -19,5 +27,7 @@ plugin/build/
 *.ilk
 *.pdb
 
-# Local Session State
+# Local Session State & Cached Objects
 .gitmusic/objects/
+**/.gitmusic/objects/
+
