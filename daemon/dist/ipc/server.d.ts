@@ -13,8 +13,11 @@ export declare class DaemonIPCServer {
     private projectRoot;
     private wss;
     private clients;
+    private cloudGateway;
+    private pullRequests;
     private currentTransport;
     constructor(port: number, ledger: ProjectLedger, cas: ContentAddressableStorage, projectRoot: string);
+    private seedInitialPullRequests;
     start(): void;
     private handleIncomingMessage;
     assembleProjectState(): ProjectState;

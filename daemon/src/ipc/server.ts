@@ -10,13 +10,20 @@ import {
   DAWTransportState,
   CommitNode,
   StemInfo,
+  PullRequest,
+  MIDITrack,
 } from './protocol';
 import { ProjectLedger } from '../engine/ledger';
 import { ContentAddressableStorage } from '../engine/cas';
+import { CloudCASSyncGateway } from '../cloud/cloudSync';
+import { StemMergeEngine } from '../cloud/mergeEngine';
+import { ProjectInspector } from '../parsers/inspector';
 
 export class DaemonIPCServer {
   private wss: WebSocketServer | null = null;
   private clients: Set<WebSocket> = new Set();
+  private cloudGateway: CloudCASSyncGateway;
+  private pullRequests: PullRequest[] = [];
   private currentTransport: DAWTransportState = {
     isPlaying: false,
     bpm: 128.0,
@@ -32,7 +39,39 @@ export class DaemonIPCServer {
     private ledger: ProjectLedger,
     private cas: ContentAddressableStorage,
     private projectRoot: string
-  ) {}
+  ) {
+    this.cloudGateway = new CloudCASSyncGateway();
+    this.seedInitialPullRequests();
+  }
+
+  private seedInitialPullRequests(): void {
+    this.pullRequests.push({
+      id: 'pr_001',
+      sourceBranch: 'feat/guitar-solo-take3',
+      targetBranch: 'main',
+      title: 'feat(stems): Add Gibson Les Paul Overdriven Guitar Solo on Drop',
+      description: 'Recorded live 24-bit 48kHz guitar solo over compass 32 to 48 with tube preamp emulation.',
+      author: 'Diego (Guitarist)',
+      authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+      createdAt: new Date(Date.now() - 3600000).toISOString(),
+      status: 'open',
+      commitsCount: 2,
+      stemChanges: [
+        {
+          stemId: 'stem_guitar',
+          name: '05_GuitarSolo_Lead_Overdrive.wav',
+          action: 'added',
+          spectralCollision: {
+            frequencyRange: '1.8 kHz - 3.2 kHz',
+            withStem: '04_VocalHook_Autotune_Cleaned.wav',
+            severity: 'low',
+            suggestion: 'Slight notch EQ at 2.4 kHz recommended to clear space for lead vocal hook.',
+          },
+          lufsDelta: 1.4,
+        },
+      ],
+    });
+  }
 
   public start(): void {
     this.wss = new WebSocketServer({ port: this.port });
@@ -119,12 +158,36 @@ export class DaemonIPCServer {
       }
 
       case 'AB_LISTEN_SWITCH': {
-        // Forward A/B toggle switch directly to all plugin audio processors
         this.broadcast({
           type: 'AB_LISTEN_SWITCH',
           payload: msg.payload,
           timestamp: Date.now(),
         });
+        break;
+      }
+
+      case 'TRIGGER_CLOUD_SYNC': {
+        const history = this.ledger.getHistory();
+        const hashes = history.flatMap((c) => c.stems.map((s) => s.hash));
+        this.cloudGateway.pushChunks(this.cas, hashes).then(() => {
+          this.broadcastProjectState();
+        });
+        break;
+      }
+
+      case 'MERGE_PULL_REQUEST': {
+        const pr = this.pullRequests.find((p) => p.id === msg.payload.prId);
+        if (pr) {
+          pr.status = 'merged';
+          const history = this.ledger.getHistory();
+          const targetCommit = history.find((c) => c.branch === pr.targetBranch) || history[0];
+          const sourceCommit = history.find((c) => c.branch === pr.sourceBranch) || history[0];
+
+          const mergePlan = StemMergeEngine.analyzeMerge(sourceCommit, targetCommit);
+          StemMergeEngine.executeMerge(this.ledger, mergePlan, pr.author);
+          console.log(`[IPC Server] Successfully merged PR "${pr.title}"`);
+          this.broadcastProjectState();
+        }
         break;
       }
     }
@@ -144,6 +207,36 @@ export class DaemonIPCServer {
     }
 
     const metrics = this.cas.getStorageMetrics(allReferences);
+    const syncStatus = this.cloudGateway.getStatusSummary(allReferences.length);
+
+    // Default MIDI tracks if head doesn't have custom midi
+    const defaultMidiTracks: MIDITrack[] = [
+      {
+        id: 'tr_bass',
+        name: '02_Serum_ReeseBass (MIDI)',
+        color: '#00FF66',
+        instrument: 'Serum Sub-Bass',
+        notes: [
+          { id: 'm1', pitch: 36, startBar: 1.0, durationBars: 1.5, velocity: 110, diffStatus: 'unchanged' },
+          { id: 'm2', pitch: 36, startBar: 2.5, durationBars: 0.5, velocity: 115, diffStatus: 'unchanged' },
+          { id: 'm3', pitch: 39, startBar: 3.0, durationBars: 1.0, velocity: 120, diffStatus: 'modified' },
+          { id: 'm4', pitch: 41, startBar: 4.0, durationBars: 0.75, velocity: 125, diffStatus: 'added' },
+        ],
+      },
+      {
+        id: 'tr_lead',
+        name: '03_Lead_CyberArp (MIDI)',
+        color: '#00F0FF',
+        instrument: 'Vital Synth Arp',
+        notes: [
+          { id: 'm5', pitch: 60, startBar: 1.0, durationBars: 0.25, velocity: 95, diffStatus: 'unchanged' },
+          { id: 'm6', pitch: 63, startBar: 1.25, durationBars: 0.25, velocity: 100, diffStatus: 'unchanged' },
+          { id: 'm7', pitch: 67, startBar: 1.5, durationBars: 0.5, velocity: 105, diffStatus: 'added' },
+          { id: 'm8', pitch: 72, startBar: 2.0, durationBars: 0.5, velocity: 110, diffStatus: 'added' },
+          { id: 'm9', pitch: 58, startBar: 2.75, durationBars: 0.25, velocity: 90, diffStatus: 'removed' },
+        ],
+      },
+    ];
 
     return {
       projectName: 'Cyberpunk Bassline - Session',
@@ -153,7 +246,9 @@ export class DaemonIPCServer {
       branches,
       history,
       stems: head ? head.stems : [],
+      midiTracks: head?.midiTracks || defaultMidiTracks,
       comments: head ? head.comments : [],
+      pullRequests: this.pullRequests,
       transport: this.currentTransport,
       storageStats: {
         totalTrackedFiles: allReferences.length,
@@ -161,6 +256,7 @@ export class DaemonIPCServer {
         dedupStorageBytes: metrics.uniqueStoredBytes,
         savingsPercentage: metrics.savingsPercentage,
       },
+      cloudSyncStatus: syncStatus,
     };
   }
 

@@ -26,6 +26,9 @@ export interface StemInfo {
   isSolo?: boolean;
   missingPlugin?: string | null;
   isFrozen?: boolean;
+  rmsDb?: number;
+  peakDb?: number;
+  lufsIntegrated?: number;
 }
 
 export interface AudioComment {
@@ -40,6 +43,46 @@ export interface AudioComment {
   resolved: boolean;
 }
 
+export interface MIDINote {
+  id: string;
+  pitch: number; // 0-127 (e.g. 60 = Middle C / C4)
+  startBar: number; // e.g. 1.0, 1.25, 2.5
+  durationBars: number; // e.g. 0.25 (sixteenth note), 1.0 (quarter note)
+  velocity: number; // 0-127
+  channel?: number;
+  diffStatus?: 'added' | 'removed' | 'modified' | 'unchanged';
+}
+
+export interface MIDITrack {
+  id: string;
+  name: string;
+  color?: string;
+  instrument?: string;
+  notes: MIDINote[];
+}
+
+export interface DAWPluginInfo {
+  name: string;
+  vendor?: string;
+  format: 'vst2' | 'vst3' | 'au' | 'clap' | 'native';
+  isMissing: boolean;
+  presetName?: string;
+  channelIndex?: number;
+}
+
+export interface DAWProjectInspection {
+  dawType: 'flp' | 'als' | 'rpp' | 'logicx' | 'generic';
+  version?: string;
+  bpm: number;
+  timeSigNumerator: number;
+  timeSigDenominator: number;
+  title?: string;
+  plugins: DAWPluginInfo[];
+  audioSamples: string[];
+  midiTracks: MIDITrack[];
+  rawChunkCount?: number;
+}
+
 export interface CommitNode {
   hash: string;
   parentHash: string | null;
@@ -52,8 +95,10 @@ export interface CommitNode {
     fileHash: string;
     dawType: 'flp' | 'als' | 'rpp' | 'logicx' | 'generic';
     bpm: number;
+    inspection?: DAWProjectInspection;
   };
   stems: StemInfo[];
+  midiTracks?: MIDITrack[];
   comments: AudioComment[];
   totalSizeBytes: number;
   dedupSavedBytes: number;
@@ -67,6 +112,31 @@ export interface BranchInfo {
   lastUpdated: string;
 }
 
+export interface PullRequest {
+  id: string;
+  sourceBranch: string;
+  targetBranch: string;
+  title: string;
+  description: string;
+  author: string;
+  authorAvatar?: string;
+  createdAt: string;
+  status: 'open' | 'merged' | 'closed';
+  commitsCount: number;
+  stemChanges: {
+    stemId: string;
+    name: string;
+    action: 'added' | 'modified' | 'deleted' | 'unchanged';
+    spectralCollision?: {
+      frequencyRange: string;
+      withStem: string;
+      severity: 'low' | 'medium' | 'high';
+      suggestion: string;
+    };
+    lufsDelta?: number;
+  }[];
+}
+
 export interface ProjectState {
   projectName: string;
   projectPath: string;
@@ -75,13 +145,23 @@ export interface ProjectState {
   branches: BranchInfo[];
   history: CommitNode[];
   stems: StemInfo[];
+  midiTracks: MIDITrack[];
   comments: AudioComment[];
+  pullRequests: PullRequest[];
   transport: DAWTransportState;
+  inspectedProject?: DAWProjectInspection;
   storageStats: {
     totalTrackedFiles: number;
     totalSizeBytes: number;
     dedupStorageBytes: number;
     savingsPercentage: number;
+  };
+  cloudSyncStatus: {
+    isSynced: boolean;
+    pendingUploads: number;
+    pendingDownloads: number;
+    lastSyncedAt: string | null;
+    endpoint: string;
   };
 }
 
@@ -98,7 +178,10 @@ export type IPCMessageType =
   | 'AB_LISTEN_SWITCH'
   | 'REQUEST_DIFF'
   | 'DIFF_RESPONSE'
-  | 'FREEZE_STEM';
+  | 'FREEZE_STEM'
+  | 'TRIGGER_CLOUD_SYNC'
+  | 'CREATE_PULL_REQUEST'
+  | 'MERGE_PULL_REQUEST';
 
 export interface IPCMessage<T = any> {
   type: IPCMessageType;

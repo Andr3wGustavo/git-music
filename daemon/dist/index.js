@@ -42,6 +42,7 @@ const cas_1 = require("./engine/cas");
 const ledger_1 = require("./engine/ledger");
 const watcher_1 = require("./engine/watcher");
 const server_1 = require("./ipc/server");
+const inspector_1 = require("./parsers/inspector");
 const PORT = parseInt(process.env.GIT_MUSIC_PORT || '4848', 10);
 const PROJECT_ROOT = path.resolve(process.env.PROJECT_ROOT || path.join(__dirname, '..', '..'));
 console.log('====================================================');
@@ -163,8 +164,18 @@ if (ledger.getHistory().length === 0) {
 }
 const server = new server_1.DaemonIPCServer(PORT, ledger, cas, PROJECT_ROOT);
 server.start();
-const watcher = new watcher_1.ProjectFileWatcher(PROJECT_ROOT, (eventType, filePath) => {
+const watcher = new watcher_1.ProjectFileWatcher(PROJECT_ROOT, async (eventType, filePath) => {
     console.log(`[Watcher] ${eventType.toUpperCase()} detected: ${filePath}`);
+    // Inspect project file if it is an FLP, ALS, or RPP file
+    if (['.flp', '.als', '.rpp'].some((ext) => filePath.toLowerCase().endsWith(ext))) {
+        try {
+            const inspection = await inspector_1.ProjectInspector.inspectFile(filePath);
+            console.log(`[Inspector] Parsed ${inspection.dawType.toUpperCase()} | BPM: ${inspection.bpm} | Plugins: ${inspection.plugins.length} | MIDI Tracks: ${inspection.midiTracks.length}`);
+        }
+        catch (err) {
+            console.warn(`[Inspector] Could not inspect file ${filePath}:`, err);
+        }
+    }
     // Notify connected UI and plugins of file modification
     server.broadcastProjectState();
 });
