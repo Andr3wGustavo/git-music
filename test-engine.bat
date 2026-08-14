@@ -1,10 +1,10 @@
 @echo off
-chcp 65001 >nul
-title Git-Music :: Engine Test Runner
+setlocal enabledelayedexpansion
+title Git-Music - Engine Test Runner
 
 cls
 echo ==============================================================================
-echo   🧪 GIT-MUSIC -- Core Engine & Parser Verification Suite
+echo   GIT-MUSIC -- Core Engine and Parser Verification Suite
 echo ==============================================================================
 echo.
 
@@ -12,6 +12,6 @@ call npm run test
 
 echo.
 echo ==============================================================================
-echo   Press any key to close this test runner window.
+echo   Test run completed. Press any key to exit.
 echo ==============================================================================
 pause >nul

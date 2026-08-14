@@ -3,6 +3,7 @@
 #include <vector>
 #include <cmath>
 #include "RingBuffer.h"
+#include "WebViewContainer.h"
 
 /**
  * @struct DAWTransportInfo
@@ -48,8 +49,8 @@ public:
     void setABMode(ABMode mode);
     void setCrossfade(float targetAtoBMix); // 0.0 = 100% Live, 1.0 = 100% Comparison
 
-    // Load comparison buffer for A/B preview
-    void loadComparisonAudio(const std::vector<float>& leftChannel, const std::vector<float>& rightChannel);
+    // Embedded WebView UI Container
+    WebViewContainer& getWebViewContainer() { return m_webView; }
 
 private:
     double m_sampleRate = 44100.0;
@@ -66,4 +67,7 @@ private:
 
     // Lock-free ring buffer for transport events
     SpscFifoRingBuffer<DAWTransportInfo, 128> m_transportQueue;
+
+    // Native in-DAW WebView container
+    WebViewContainer m_webView;
 };

@@ -14,6 +14,7 @@ include_directories(
 set(PLUGIN_SOURCES
     src/GitMusicProcessor.cpp
     src/IPCBridge.cpp
+    src/WebViewContainer.cpp
 )
 
 # Shared library target (VST3 / CLAP compatible binary)
@@ -38,4 +39,4 @@ set_target_properties(git_music_plugin PROPERTIES
     SUFFIX ".vst3"
 )
 
-message(STATUS "Configured GitMusicPlugin for C++20 VST3/CLAP target.")
+message(STATUS "Configured GitMusicPlugin for C++20 VST3/CLAP target with embedded WebView container.")
