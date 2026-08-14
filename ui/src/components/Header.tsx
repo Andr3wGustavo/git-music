@@ -13,6 +13,7 @@ import {
   Music,
   Radio,
   Award,
+  Sparkles,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -20,6 +21,8 @@ interface HeaderProps {
   onOpenBranchModal: () => void;
   onOpenPullRequestModal: () => void;
   onOpenSplitSheetModal: () => void;
+  onToggleAICopilot: () => void;
+  isAICopilotOpen?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -27,6 +30,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenBranchModal,
   onOpenPullRequestModal,
   onOpenSplitSheetModal,
+  onToggleAICopilot,
+  isAICopilotOpen = false,
 }) => {
   const {
     projectState,
@@ -50,21 +55,21 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="glass-panel border-b border-studio-border/80 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-2xl">
       {/* Left: Branding & Project Title */}
       <div className="flex items-center space-x-4">
-        <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-studio-accent/20 to-studio-neonPurple/30 border border-studio-accent/40 shadow-lg shadow-studio-accent/10">
-          <Disc className="w-6 h-6 text-studio-accent animate-spin" style={{ animationDuration: '8s' }} />
-          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-studio-neonGreen rounded-full border-2 border-studio-bg animate-pulse"></div>
+        <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500/20 to-purple-500/30 border border-cyan-500/40 shadow-lg shadow-cyan-500/10">
+          <Disc className="w-6 h-6 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
+          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-slate-950 animate-pulse"></div>
         </div>
 
         <div>
           <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-studio-accent">
+            <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyan-400">
               {projectState.projectName}
             </h1>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-studio-card border border-studio-border text-studio-accent font-mono">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-cyan-400 font-mono">
               {projectState.transport.dawName || 'FL Studio 21'}
             </span>
           </div>
-          <p className="text-xs text-studio-muted font-mono truncate max-w-md">
+          <p className="text-xs text-slate-400 font-mono truncate max-w-md">
             {projectState.projectPath}
           </p>
         </div>
@@ -102,16 +107,16 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="relative">
           <button
             onClick={() => setBranchDropdownOpen(!branchDropdownOpen)}
-            className="flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-studio-card/80 hover:bg-studio-card border border-studio-border hover:border-studio-accent/50 text-sm font-medium transition-all group"
+            className="flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-purple-500/50 text-sm font-medium transition-all group"
           >
-            <GitBranch className="w-4 h-4 text-studio-neonPurple group-hover:rotate-12 transition-transform" />
+            <GitBranch className="w-4 h-4 text-purple-400 group-hover:rotate-12 transition-transform" />
             <span className="text-slate-200 font-mono">{projectState.currentBranch}</span>
-            <ChevronDown className="w-3.5 h-3.5 text-studio-muted" />
+            <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
           </button>
 
           {branchDropdownOpen && (
-            <div className="absolute top-full mt-2 left-0 w-64 glass-panel rounded-xl shadow-2xl p-2 z-50 border border-studio-border bg-slate-900">
-              <div className="text-[10px] uppercase font-bold text-studio-muted px-2 py-1 tracking-wider">
+            <div className="absolute top-full mt-2 left-0 w-64 rounded-xl shadow-2xl p-2 z-50 border border-slate-800 bg-slate-900/95 backdrop-blur-xl">
+              <div className="text-[10px] uppercase font-bold text-slate-500 px-2 py-1 tracking-wider">
                 Active Branches
               </div>
               <div className="space-y-1 max-h-48 overflow-y-auto">
@@ -124,24 +129,24 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className={`w-full text-left flex items-center justify-between px-3 py-2 rounded-lg text-xs font-mono transition-colors ${
                       b.name === projectState.currentBranch
-                        ? 'bg-studio-accent/15 text-studio-accent border border-studio-accent/30 font-semibold'
-                        : 'text-slate-300 hover:bg-studio-surface'
+                        ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 font-semibold'
+                        : 'text-slate-300 hover:bg-slate-800'
                     }`}
                   >
                     <span className="truncate">{b.name}</span>
-                    {b.name === projectState.currentBranch && <CheckCircle2 className="w-3.5 h-3.5 text-studio-accent shrink-0 ml-2" />}
+                    {b.name === projectState.currentBranch && <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400 shrink-0 ml-2" />}
                   </button>
                 ))}
               </div>
-              <div className="pt-2 mt-2 border-t border-studio-border">
+              <div className="pt-2 mt-2 border-t border-slate-800">
                 <button
                   onClick={() => {
                     setBranchDropdownOpen(false);
                     onOpenBranchModal();
                   }}
-                  className="w-full flex items-center justify-center space-x-1.5 px-3 py-1.5 rounded-lg bg-studio-surface hover:bg-studio-border text-xs text-slate-200 transition-colors"
+                  className="w-full flex items-center justify-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 transition-colors"
                 >
-                  <Plus className="w-3.5 h-3.5 text-studio-accent" />
+                  <Plus className="w-3.5 h-3.5 text-cyan-400" />
                   <span>Create New Branch</span>
                 </button>
               </div>
@@ -150,17 +155,30 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* CAS Deduplication Metric Badge */}
-        <div className="hidden xl:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-studio-card/60 border border-studio-border text-xs">
-          <HardDrive className="w-3.5 h-3.5 text-studio-neonGreen" />
-          <span className="text-studio-muted">Deduplication:</span>
-          <span className="text-studio-neonGreen font-semibold font-mono">
+        <div className="hidden xl:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+          <HardDrive className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="text-slate-500">Deduplication:</span>
+          <span className="text-emerald-400 font-semibold font-mono">
             {projectState.storageStats.savingsPercentage}% Saved
           </span>
         </div>
       </div>
 
-      {/* Right: Split Sheet, Cloud Sync, Pull Requests & Commit Button */}
+      {/* Right: AI Copilot, Split Sheet, Cloud Sync, Pull Requests & Commit Button */}
       <div className="flex items-center space-x-2.5">
+        {/* AI Copilot Button */}
+        <button
+          onClick={onToggleAICopilot}
+          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all shadow-sm ${
+            isAICopilotOpen
+              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-purple-400 shadow-purple-500/30'
+              : 'bg-slate-950 border-purple-500/40 text-purple-300 hover:bg-purple-950/20 hover:border-purple-400'
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
+          <span>AI Copilot</span>
+        </button>
+
         {/* Split Sheet Modal Button */}
         <button
           onClick={onOpenSplitSheetModal}
@@ -199,7 +217,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* New Commit Button */}
         <button
           onClick={onOpenCommitModal}
-          className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-studio-accent to-studio-neonPurple hover:opacity-90 text-white text-xs font-semibold shadow-lg shadow-studio-accent/20 transition-all hover:scale-105 active:scale-95"
+          className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/20 transition-all hover:scale-105 active:scale-95"
         >
           <GitCommit className="w-4 h-4" />
           <span>Commit & Push</span>

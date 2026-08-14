@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { TransportBar } from './components/TransportBar';
 import { WaveformVisualizer } from './components/WaveformVisualizer';
 import { PianoRollDiff } from './components/PianoRollDiff';
+import { SpectrumAnalyzer } from './components/SpectrumAnalyzer';
 import { CommitTimeline } from './components/CommitTimeline';
 import { StemList } from './components/StemList';
 import { AudioCommentsList } from './components/AudioCommentsList';
@@ -12,6 +13,7 @@ import { BranchModal } from './components/BranchModal';
 import { CommentModal } from './components/CommentModal';
 import { PullRequestModal } from './components/PullRequestModal';
 import { SplitSheetModal } from './components/SplitSheetModal';
+import { AIMixCopilot } from './components/AIMixCopilot';
 
 const StudioCockpit: React.FC = () => {
   const { activeView } = useIPC();
@@ -19,6 +21,7 @@ const StudioCockpit: React.FC = () => {
   const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
   const [isPullRequestModalOpen, setIsPullRequestModalOpen] = useState(false);
   const [isSplitSheetModalOpen, setIsSplitSheetModalOpen] = useState(false);
+  const [isAICopilotOpen, setIsAICopilotOpen] = useState(false);
   const [commentModalState, setCommentModalState] = useState<{ isOpen: boolean; barPosition: number }>({
     isOpen: false,
     barPosition: 1.0,
@@ -29,24 +32,30 @@ const StudioCockpit: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#080b11] via-[#0c101a] to-[#080b11] text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-[#06080e] via-[#0a0e18] to-[#06080e] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* Top Studio Header */}
       <Header
         onOpenCommitModal={() => setIsCommitModalOpen(true)}
         onOpenBranchModal={() => setIsBranchModalOpen(true)}
         onOpenPullRequestModal={() => setIsPullRequestModalOpen(true)}
         onOpenSplitSheetModal={() => setIsSplitSheetModalOpen(true)}
+        onToggleAICopilot={() => setIsAICopilotOpen(!isAICopilotOpen)}
+        isAICopilotOpen={isAICopilotOpen}
       />
 
       {/* Main Workspace Layout */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
-        {/* Real-time DAW Transport & A/B Switcher */}
+        {/* Real-time DAW Transport & A/B Switcher with Stereo VU Meters */}
         <TransportBar />
 
         {/* Dynamic Studio Visualizer: Waveform vs Piano Roll */}
-        <div className="transition-all duration-300">
+        <div className="transition-all duration-300 space-y-4">
           {activeView === 'waveform' ? (
-            <WaveformVisualizer onAddCommentAtBar={handleAddCommentAtBar} />
+            <div className="space-y-4">
+              <WaveformVisualizer onAddCommentAtBar={handleAddCommentAtBar} />
+              {/* Real-Time 60 FPS Stereo FFT Spectrum Analyzer */}
+              <SpectrumAnalyzer />
+            </div>
           ) : (
             <div className="h-[480px]">
               <PianoRollDiff />
@@ -68,6 +77,12 @@ const StudioCockpit: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Slide-Over AI Mix Copilot */}
+      <AIMixCopilot
+        isOpen={isAICopilotOpen}
+        onClose={() => setIsAICopilotOpen(false)}
+      />
 
       {/* Modals */}
       <CommitModal

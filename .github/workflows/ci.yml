@@ -1,0 +1,40 @@
+name: Git-Music CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-verify:
+    name: Verify Engine & UI Builds
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies across Monorepo
+        run: |
+          npm --prefix daemon install
+          npm --prefix ui install
+
+      - name: Run 11 Extended Engine Tests
+        run: npm run test
+
+      - name: Compile TypeScript Daemon
+        run: npm --prefix daemon run build
+
+      - name: Build Studio Cockpit Production Bundle
+        run: npm --prefix ui run build
