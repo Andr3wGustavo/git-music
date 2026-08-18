@@ -45,6 +45,10 @@ O **Git-Music** foi desenhado com arquitetura de 3 camadas (*Three-Tier Decouple
   - Cálculo de porcentagem de autoria por contribuição de stems/tempo, com assinatura criptográfica Merkle/Ed25519 e exportação em JSON/PDF.
 - [x] **Modais de Colaboração & Pull Requests (`BranchModal.tsx`, `PullRequestModal.tsx`):**
   - Criação de branches e revisão de PRs multi-produtores com detecção de colisões espectrais.
+- [x] **Hub de Sala de Colaboração em Tempo Real (`LiveCollabRoomModal.tsx`):**
+  - Monitoramento de produtores online (FL Studio, Ableton, Reaper), latência de ping (ms), sincronização de playhead e link de convite instantâneo.
+- [x] **Guia Mestre Didático Interativo (`DidacticGuideModal.tsx`):**
+  - Masterclass interativa embutida explicando Snapshots, Equal-Power Crossfade, FastCDC, detecção de colisões de graves e Split Sheets legais.
 
 ---
 
@@ -65,6 +69,10 @@ O **Git-Music** foi desenhado com arquitetura de 3 camadas (*Three-Tier Decouple
   - Cálculo de delta de hashes para upload/download apenas dos chunks não existentes no bucket remoto.
 - [x] **Ponte de Separação de Stems por IA (`demucsBridge.ts`):**
   - Integração para separação de áudio estéreo em 4 stems isoladas (Bateria, Baixo, Vocal, Outros).
+- [x] **Hub de Produção Compartilhada em Tempo Real (`realtimeRelay.ts`):**
+  - Gerenciador de sessões e salas multi-produtores com sincronização de playhead, presença P2P, streaming de deltas de stems e broadcast de eventos MIDI ao vivo.
+- [x] **Detector Automático de Sessão DAW (`autoDetect.ts`):**
+  - Identificação e vinculação automática de projetos recentes `.flp` (FL Studio), `.als` (Ableton Live) e `.rpp` (Reaper) sem necessidade de configuração manual.
 
 ---
 
