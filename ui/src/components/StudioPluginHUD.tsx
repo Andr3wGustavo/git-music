@@ -22,7 +22,9 @@ import {
   Sparkles,
   MessageSquare,
   Grid,
-  GitPullRequest
+  GitPullRequest,
+  Users,
+  BookOpen
 } from 'lucide-react';
 import { WebAudioEngine } from '../audio/WebAudioEngine';
 import { VUMeter } from './VUMeter';
@@ -36,6 +38,8 @@ import { BranchModal } from './BranchModal';
 import { PullRequestModal } from './PullRequestModal';
 import { CommentModal } from './CommentModal';
 import { CommitModal } from './CommitModal';
+import { LiveCollabRoomModal } from './LiveCollabRoomModal';
+import { DidacticGuideModal } from './DidacticGuideModal';
 
 type StudioTab = 'timeline' | 'audio_diff' | 'piano_roll' | 'stems' | 'copilot' | 'comments';
 
@@ -67,6 +71,8 @@ export const StudioPluginHUD: React.FC = () => {
   const [isPrModalOpen, setIsPrModalOpen] = useState(false);
   const [isCommitModalOpen, setIsCommitModalOpen] = useState(false);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+  const [isCollabModalOpen, setIsCollabModalOpen] = useState(false);
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
   const [commentBar, setCommentBar] = useState(1);
 
   const transport = projectState.transport;
@@ -121,6 +127,8 @@ export const StudioPluginHUD: React.FC = () => {
     setIsCommentModalOpen(true);
   };
 
+  const onlineProducersCount = projectState.liveSession?.activeProducers?.filter((p) => p.isOnline).length || 2;
+
   return (
     <div className="w-full max-w-[840px] mx-auto bg-[#070707] border-2 border-[#1c1c1c] rounded-none shadow-2xl overflow-hidden font-mono text-white select-none transition-all">
       {/* 1. TOP HARDWARE CHASSIS BEZEL */}
@@ -143,7 +151,7 @@ export const StudioPluginHUD: React.FC = () => {
 
         {/* Center: Live Timecode & Session Info */}
         <div className="hidden sm:flex items-center space-x-3 text-[11px] text-[#888]">
-          <span className="text-white font-bold truncate max-w-[160px]">
+          <span className="text-white font-bold truncate max-w-[150px]">
             {projectState.projectName}
           </span>
           <span>•</span>
@@ -152,10 +160,21 @@ export const StudioPluginHUD: React.FC = () => {
           <span className="text-[#0099FF] font-bold">BAR {Math.floor(transport.barPosition)}:1</span>
         </div>
 
-        {/* Right: Storage CAS, Cloud Sync & Hardware Screw */}
-        <div className="flex items-center space-x-2">
-          <span className="text-[10px] px-2 py-0.5 bg-black border border-[#222] text-[#10B981] font-bold">
-            {projectState.storageStats.savingsPercentage}% CAS SAVED
+        {/* Right: Live Room, Storage CAS, Cloud Sync, Splits & Guide */}
+        <div className="flex items-center space-x-1.5">
+          {/* Live Collab Session Badge */}
+          <button
+            onClick={() => setIsCollabModalOpen(true)}
+            className="flex items-center space-x-1 px-2 py-0.5 bg-[#0e1712] border border-[#10B981]/50 hover:border-[#10B981] text-[10px] text-[#10B981] font-bold uppercase transition-none"
+            title="Abrir sala de produção compartilhada em tempo real"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping"></span>
+            <Users className="w-3 h-3" />
+            <span>{onlineProducersCount} ONLINE</span>
+          </button>
+
+          <span className="text-[10px] px-1.5 py-0.5 bg-black border border-[#222] text-[#10B981] font-bold hidden md:inline">
+            {projectState.storageStats.savingsPercentage}% CAS
           </span>
 
           <button
@@ -165,7 +184,7 @@ export const StudioPluginHUD: React.FC = () => {
             title="Sync chunks to Cloudflare R2"
           >
             <Cloud className={`w-3 h-3 ${isSyncing ? 'text-[#0099FF] animate-spin' : 'text-[#888]'}`} />
-            <span>{isSyncing ? 'SYNCING...' : 'R2 SYNC'}</span>
+            <span className="hidden sm:inline">{isSyncing ? 'SYNC...' : 'R2'}</span>
           </button>
 
           <button
@@ -175,6 +194,15 @@ export const StudioPluginHUD: React.FC = () => {
           >
             <Award className="w-3 h-3" />
             <span className="hidden sm:inline">SPLITS</span>
+          </button>
+
+          <button
+            onClick={() => setIsGuideModalOpen(true)}
+            className="flex items-center space-x-1 px-2 py-0.5 bg-[#1a1405] border border-[#ffb703]/50 hover:border-[#ffb703] text-[10px] text-[#ffb703] transition-none uppercase font-bold"
+            title="Abrir Guia Didático Master de Engenharia de Áudio"
+          >
+            <BookOpen className="w-3 h-3" />
+            <span className="hidden sm:inline">GUIA PRO</span>
           </button>
 
           {/* Hex screw visual */}
@@ -638,6 +666,8 @@ export const StudioPluginHUD: React.FC = () => {
       <PullRequestModal isOpen={isPrModalOpen} onClose={() => setIsPrModalOpen(false)} />
       <CommentModal isOpen={isCommentModalOpen} barPosition={commentBar} onClose={() => setIsCommentModalOpen(false)} />
       <CommitModal isOpen={isCommitModalOpen} onClose={() => setIsCommitModalOpen(false)} />
+      <LiveCollabRoomModal isOpen={isCollabModalOpen} onClose={() => setIsCollabModalOpen(false)} />
+      <DidacticGuideModal isOpen={isGuideModalOpen} onClose={() => setIsGuideModalOpen(false)} />
     </div>
   );
 };

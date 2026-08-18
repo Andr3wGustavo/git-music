@@ -1,6 +1,7 @@
 /**
  * @file server.ts
  * @description WebSocket IPC Server for low-latency communication with In-DAW Plugin and Web UI.
+ * Integrates RealtimeCollabRelay, ContentAddressableStorage, Ledger DAG, and DAWAutoDetector.
  */
 
 import { WebSocketServer, WebSocket } from 'ws';
@@ -17,12 +18,14 @@ import { ProjectLedger } from '../engine/ledger';
 import { ContentAddressableStorage } from '../engine/cas';
 import { CloudCASSyncGateway } from '../cloud/cloudSync';
 import { StemMergeEngine } from '../cloud/mergeEngine';
-import { ProjectInspector } from '../parsers/inspector';
+import { RealtimeCollabRelay } from '../cloud/realtimeRelay';
+import { DAWAutoDetector } from '../parsers/autoDetect';
 
 export class DaemonIPCServer {
   private wss: WebSocketServer | null = null;
   private clients: Set<WebSocket> = new Set();
   private cloudGateway: CloudCASSyncGateway;
+  private collabRelay: RealtimeCollabRelay;
   private pullRequests: PullRequest[] = [];
   private currentTransport: DAWTransportState = {
     isPlaying: false,
@@ -41,7 +44,9 @@ export class DaemonIPCServer {
     private projectRoot: string
   ) {
     this.cloudGateway = new CloudCASSyncGateway();
+    this.collabRelay = new RealtimeCollabRelay();
     this.seedInitialPullRequests();
+    this.seedLiveCollabRoom();
   }
 
   private seedInitialPullRequests(): void {
@@ -70,6 +75,28 @@ export class DaemonIPCServer {
           lufsDelta: 1.4,
         },
       ],
+    });
+  }
+
+  private seedLiveCollabRoom(): void {
+    this.collabRelay.joinRoom('studio_main', 'Neon Cyberpunk Studio (Shared Session)', {
+      producerId: 'prod_alex',
+      name: 'Alex (Lead Producer)',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+      daw: 'FL Studio 21',
+      role: 'beatmaker',
+      color: '#FF5500',
+      currentBarPosition: 1.0,
+    });
+
+    this.collabRelay.joinRoom('studio_main', 'Neon Cyberpunk Studio (Shared Session)', {
+      producerId: 'prod_sarah',
+      name: 'Sarah (Vocalist & Mix)',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
+      daw: 'Ableton Live 11',
+      role: 'vocalist',
+      color: '#0070F3',
+      currentBarPosition: 16.0,
     });
   }
 
@@ -117,6 +144,7 @@ export class DaemonIPCServer {
 
       case 'DAW_TRANSPORT_SYNC':
         this.currentTransport = { ...this.currentTransport, ...msg.payload };
+        this.collabRelay.syncTransport('studio_main', 'client_active', msg.payload);
         this.broadcast({
           type: 'DAW_TRANSPORT_SYNC',
           payload: this.currentTransport,
@@ -190,6 +218,12 @@ export class DaemonIPCServer {
         }
         break;
       }
+
+      case 'JOIN_LIVE_ROOM': {
+        this.collabRelay.joinRoom(msg.payload.roomId, msg.payload.roomName, msg.payload.producer);
+        this.broadcastProjectState();
+        break;
+      }
     }
   }
 
@@ -208,6 +242,7 @@ export class DaemonIPCServer {
 
     const metrics = this.cas.getStorageMetrics(allReferences);
     const syncStatus = this.cloudGateway.getStatusSummary(allReferences.length);
+    const liveSessionSummary = this.collabRelay.getRoomSummary('studio_main');
 
     // Default MIDI tracks if head doesn't have custom midi
     const defaultMidiTracks: MIDITrack[] = [
@@ -250,6 +285,13 @@ export class DaemonIPCServer {
       comments: head ? head.comments : [],
       pullRequests: this.pullRequests,
       transport: this.currentTransport,
+      liveSession: liveSessionSummary ? {
+        roomId: liveSessionSummary.roomId,
+        roomName: liveSessionSummary.roomName,
+        isTransportLocked: liveSessionSummary.transportLockEnabled,
+        liveMidiBroadcastEnabled: liveSessionSummary.liveMidiBroadcastEnabled,
+        activeProducers: liveSessionSummary.producers,
+      } : undefined,
       storageStats: {
         totalTrackedFiles: allReferences.length,
         totalSizeBytes: metrics.totalReferencedBytes,

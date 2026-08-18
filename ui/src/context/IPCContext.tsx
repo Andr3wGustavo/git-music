@@ -142,9 +142,40 @@ export interface ProjectState {
   stems: StemInfo[];
   midiTracks: MIDITrack[];
   comments: AudioComment[];
+export interface LiveProducerPresence {
+  producerId: string;
+  name: string;
+  avatar: string;
+  daw: string;
+  role: 'beatmaker' | 'vocalist' | 'mixing_engineer' | 'sound_designer';
+  color: string;
+  isOnline: boolean;
+  pingMs: number;
+  currentBarPosition: number;
+}
+
+export interface LiveCollabRoomState {
+  roomId: string;
+  roomName: string;
+  isTransportLocked: boolean;
+  liveMidiBroadcastEnabled: boolean;
+  activeProducers: LiveProducerPresence[];
+}
+
+export interface ProjectState {
+  projectName: string;
+  projectPath: string;
+  currentBranch: string;
+  headCommit: string | null;
+  branches: BranchInfo[];
+  history: CommitNode[];
+  stems: StemInfo[];
+  midiTracks: MIDITrack[];
+  comments: AudioComment[];
   pullRequests: PullRequest[];
   transport: DAWTransportState;
   inspectedProject?: DAWProjectInspection;
+  liveSession?: LiveCollabRoomState;
   storageStats: {
     totalTrackedFiles: number;
     totalSizeBytes: number;
@@ -184,6 +215,7 @@ interface IPCContextType {
   toggleFreezeStem: (stemId: string) => void;
   triggerCloudSync: () => void;
   mergePullRequest: (prId: string) => void;
+  joinLiveRoom: (roomId: string, name: string, daw: string) => void;
 }
 
 const DEFAULT_STATE: ProjectState = {
@@ -493,6 +525,22 @@ export const IPCProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     sendIPC('MERGE_PULL_REQUEST', { prId });
   };
 
+  const joinLiveRoom = (roomId: string, name: string, daw: string) => {
+    sendIPC('JOIN_LIVE_ROOM', {
+      roomId,
+      roomName: `${name}'s Live Session`,
+      producer: {
+        producerId: `prod_${Date.now()}`,
+        name,
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+        daw,
+        role: 'beatmaker',
+        color: '#FF5500',
+        currentBarPosition: 1.0,
+      },
+    });
+  };
+
   return (
     <IPCContext.Provider
       value={{
@@ -517,6 +565,7 @@ export const IPCProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         toggleFreezeStem,
         triggerCloudSync,
         mergePullRequest,
+        joinLiveRoom,
       }}
     >
       {children}

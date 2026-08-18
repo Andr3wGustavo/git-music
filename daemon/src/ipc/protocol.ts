@@ -137,6 +137,26 @@ export interface PullRequest {
   }[];
 }
 
+export interface LiveProducerPresence {
+  producerId: string;
+  name: string;
+  avatar: string;
+  daw: string;
+  role: 'beatmaker' | 'vocalist' | 'mixing_engineer' | 'sound_designer';
+  color: string;
+  isOnline: boolean;
+  pingMs: number;
+  currentBarPosition: number;
+}
+
+export interface LiveCollabRoomState {
+  roomId: string;
+  roomName: string;
+  isTransportLocked: boolean;
+  liveMidiBroadcastEnabled: boolean;
+  activeProducers: LiveProducerPresence[];
+}
+
 export interface ProjectState {
   projectName: string;
   projectPath: string;
@@ -150,6 +170,7 @@ export interface ProjectState {
   pullRequests: PullRequest[];
   transport: DAWTransportState;
   inspectedProject?: DAWProjectInspection;
+  liveSession?: LiveCollabRoomState;
   storageStats: {
     totalTrackedFiles: number;
     totalSizeBytes: number;
@@ -181,7 +202,10 @@ export type IPCMessageType =
   | 'FREEZE_STEM'
   | 'TRIGGER_CLOUD_SYNC'
   | 'CREATE_PULL_REQUEST'
-  | 'MERGE_PULL_REQUEST';
+  | 'MERGE_PULL_REQUEST'
+  | 'JOIN_LIVE_ROOM'
+  | 'TOGGLE_TRANSPORT_LOCK'
+  | 'LIVE_MIDI_NOTE';
 
 export interface IPCMessage<T = any> {
   type: IPCMessageType;

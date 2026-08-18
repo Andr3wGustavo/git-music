@@ -115,6 +115,13 @@ export class ContentAddressableStorage {
   }
 
   /**
+   * Checks whether a chunk with the given hash is already stored.
+   */
+  public hasChunk(hash: string): boolean {
+    return this.getBlobPath(hash) !== null;
+  }
+
+  /**
    * Calculate total unique storage vs raw un-deduplicated usage.
    */
   public getStorageMetrics(allReferences: { hash: string; sizeBytes: number }[]): {
