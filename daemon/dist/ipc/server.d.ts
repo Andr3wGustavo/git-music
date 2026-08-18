@@ -1,6 +1,7 @@
 /**
  * @file server.ts
  * @description WebSocket IPC Server for low-latency communication with In-DAW Plugin and Web UI.
+ * Integrates RealtimeCollabRelay, ContentAddressableStorage, Ledger DAG, and DAWAutoDetector.
  */
 import { WebSocket } from 'ws';
 import { IPCMessage, ProjectState } from './protocol';
@@ -14,10 +15,12 @@ export declare class DaemonIPCServer {
     private wss;
     private clients;
     private cloudGateway;
+    private collabRelay;
     private pullRequests;
     private currentTransport;
     constructor(port: number, ledger: ProjectLedger, cas: ContentAddressableStorage, projectRoot: string);
     private seedInitialPullRequests;
+    private seedLiveCollabRoom;
     start(): void;
     private handleIncomingMessage;
     assembleProjectState(): ProjectState;

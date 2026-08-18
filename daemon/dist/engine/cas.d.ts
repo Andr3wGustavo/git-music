@@ -35,6 +35,10 @@ export declare class ContentAddressableStorage {
      */
     getBlobPath(hash: string): string | null;
     /**
+     * Checks whether a chunk with the given hash is already stored.
+     */
+    hasChunk(hash: string): boolean;
+    /**
      * Calculate total unique storage vs raw un-deduplicated usage.
      */
     getStorageMetrics(allReferences: {

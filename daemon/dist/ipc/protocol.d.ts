@@ -126,6 +126,24 @@ export interface PullRequest {
         lufsDelta?: number;
     }[];
 }
+export interface LiveProducerPresence {
+    producerId: string;
+    name: string;
+    avatar: string;
+    daw: string;
+    role: 'beatmaker' | 'vocalist' | 'mixing_engineer' | 'sound_designer';
+    color: string;
+    isOnline: boolean;
+    pingMs: number;
+    currentBarPosition: number;
+}
+export interface LiveCollabRoomState {
+    roomId: string;
+    roomName: string;
+    isTransportLocked: boolean;
+    liveMidiBroadcastEnabled: boolean;
+    activeProducers: LiveProducerPresence[];
+}
 export interface ProjectState {
     projectName: string;
     projectPath: string;
@@ -139,6 +157,7 @@ export interface ProjectState {
     pullRequests: PullRequest[];
     transport: DAWTransportState;
     inspectedProject?: DAWProjectInspection;
+    liveSession?: LiveCollabRoomState;
     storageStats: {
         totalTrackedFiles: number;
         totalSizeBytes: number;
@@ -153,7 +172,7 @@ export interface ProjectState {
         endpoint: string;
     };
 }
-export type IPCMessageType = 'CLIENT_HELLO' | 'PROJECT_STATE_UPDATE' | 'DAW_TRANSPORT_SYNC' | 'CREATE_COMMIT' | 'CHECKOUT_BRANCH' | 'CREATE_BRANCH' | 'ADD_AUDIO_COMMENT' | 'RESOLVE_AUDIO_COMMENT' | 'AB_LISTEN_SWITCH' | 'REQUEST_DIFF' | 'DIFF_RESPONSE' | 'FREEZE_STEM' | 'TRIGGER_CLOUD_SYNC' | 'CREATE_PULL_REQUEST' | 'MERGE_PULL_REQUEST';
+export type IPCMessageType = 'CLIENT_HELLO' | 'PROJECT_STATE_UPDATE' | 'DAW_TRANSPORT_SYNC' | 'CREATE_COMMIT' | 'CHECKOUT_BRANCH' | 'CREATE_BRANCH' | 'ADD_AUDIO_COMMENT' | 'RESOLVE_AUDIO_COMMENT' | 'AB_LISTEN_SWITCH' | 'REQUEST_DIFF' | 'DIFF_RESPONSE' | 'FREEZE_STEM' | 'TRIGGER_CLOUD_SYNC' | 'CREATE_PULL_REQUEST' | 'MERGE_PULL_REQUEST' | 'JOIN_LIVE_ROOM' | 'TOGGLE_TRANSPORT_LOCK' | 'LIVE_MIDI_NOTE';
 export interface IPCMessage<T = any> {
     type: IPCMessageType;
     payload: T;

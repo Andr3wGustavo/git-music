@@ -2,12 +2,14 @@
 /**
  * @file server.ts
  * @description WebSocket IPC Server for low-latency communication with In-DAW Plugin and Web UI.
+ * Integrates RealtimeCollabRelay, ContentAddressableStorage, Ledger DAG, and DAWAutoDetector.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DaemonIPCServer = void 0;
 const ws_1 = require("ws");
 const cloudSync_1 = require("../cloud/cloudSync");
 const mergeEngine_1 = require("../cloud/mergeEngine");
+const realtimeRelay_1 = require("../cloud/realtimeRelay");
 class DaemonIPCServer {
     port;
     ledger;
@@ -16,6 +18,7 @@ class DaemonIPCServer {
     wss = null;
     clients = new Set();
     cloudGateway;
+    collabRelay;
     pullRequests = [];
     currentTransport = {
         isPlaying: false,
@@ -32,7 +35,9 @@ class DaemonIPCServer {
         this.cas = cas;
         this.projectRoot = projectRoot;
         this.cloudGateway = new cloudSync_1.CloudCASSyncGateway();
+        this.collabRelay = new realtimeRelay_1.RealtimeCollabRelay();
         this.seedInitialPullRequests();
+        this.seedLiveCollabRoom();
     }
     seedInitialPullRequests() {
         this.pullRequests.push({
@@ -60,6 +65,26 @@ class DaemonIPCServer {
                     lufsDelta: 1.4,
                 },
             ],
+        });
+    }
+    seedLiveCollabRoom() {
+        this.collabRelay.joinRoom('studio_main', 'Neon Cyberpunk Studio (Shared Session)', {
+            producerId: 'prod_alex',
+            name: 'Alex (Lead Producer)',
+            avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80',
+            daw: 'FL Studio 21',
+            role: 'beatmaker',
+            color: '#FF5500',
+            currentBarPosition: 1.0,
+        });
+        this.collabRelay.joinRoom('studio_main', 'Neon Cyberpunk Studio (Shared Session)', {
+            producerId: 'prod_sarah',
+            name: 'Sarah (Vocalist & Mix)',
+            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
+            daw: 'Ableton Live 11',
+            role: 'vocalist',
+            color: '#0070F3',
+            currentBarPosition: 16.0,
         });
     }
     start() {
@@ -100,6 +125,7 @@ class DaemonIPCServer {
                 break;
             case 'DAW_TRANSPORT_SYNC':
                 this.currentTransport = { ...this.currentTransport, ...msg.payload };
+                this.collabRelay.syncTransport('studio_main', 'client_active', msg.payload);
                 this.broadcast({
                     type: 'DAW_TRANSPORT_SYNC',
                     payload: this.currentTransport,
@@ -164,6 +190,11 @@ class DaemonIPCServer {
                 }
                 break;
             }
+            case 'JOIN_LIVE_ROOM': {
+                this.collabRelay.joinRoom(msg.payload.roomId, msg.payload.roomName, msg.payload.producer);
+                this.broadcastProjectState();
+                break;
+            }
         }
     }
     assembleProjectState() {
@@ -179,6 +210,7 @@ class DaemonIPCServer {
         }
         const metrics = this.cas.getStorageMetrics(allReferences);
         const syncStatus = this.cloudGateway.getStatusSummary(allReferences.length);
+        const liveSessionSummary = this.collabRelay.getRoomSummary('studio_main');
         // Default MIDI tracks if head doesn't have custom midi
         const defaultMidiTracks = [
             {
@@ -219,6 +251,13 @@ class DaemonIPCServer {
             comments: head ? head.comments : [],
             pullRequests: this.pullRequests,
             transport: this.currentTransport,
+            liveSession: liveSessionSummary ? {
+                roomId: liveSessionSummary.roomId,
+                roomName: liveSessionSummary.roomName,
+                isTransportLocked: liveSessionSummary.transportLockEnabled,
+                liveMidiBroadcastEnabled: liveSessionSummary.liveMidiBroadcastEnabled,
+                activeProducers: liveSessionSummary.producers,
+            } : undefined,
             storageStats: {
                 totalTrackedFiles: allReferences.length,
                 totalSizeBytes: metrics.totalReferencedBytes,

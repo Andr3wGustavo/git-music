@@ -129,6 +129,12 @@ class ContentAddressableStorage {
         return fs.existsSync(blobPath) ? blobPath : null;
     }
     /**
+     * Checks whether a chunk with the given hash is already stored.
+     */
+    hasChunk(hash) {
+        return this.getBlobPath(hash) !== null;
+    }
+    /**
      * Calculate total unique storage vs raw un-deduplicated usage.
      */
     getStorageMetrics(allReferences) {
