@@ -1,12 +1,12 @@
 import React from 'react';
 import { IPCProvider } from './context/IPCContext';
-import { HorizontalRackHUD } from './components/HorizontalRackHUD';
+import { StudioPluginHUD } from './components/StudioPluginHUD';
 
 const StudioAppContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#000000] text-white flex flex-col items-center justify-center p-2 sm:p-4 font-mono select-none">
-      {/* 1U/2U Horizontal Studio Hardware Rack Interface */}
-      <HorizontalRackHUD />
+      {/* High-End Proportional In-DAW Studio Plugin Workstation */}
+      <StudioPluginHUD />
     </div>
   );
 };
