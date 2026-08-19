@@ -2,6 +2,9 @@
 setlocal enabledelayedexpansion
 title Git-Music - In-DAW Version Control and Collaboration
 
+REM Ensure current working directory is the script directory
+cd /d "%~dp0"
+
 cls
 echo ==============================================================================
 echo   GIT-MUSIC -- In-DAW Version Control and Collaboration Cockpit
@@ -59,13 +62,13 @@ echo ===========================================================================
 echo.
 
 REM Launch Daemon in a dedicated background window
-start "Git-Music Daemon Server" cmd /k "npm --prefix daemon run start"
+start "Git-Music Daemon Server" cmd /k "cd /d ""%~dp0daemon"" && npm run start"
 
 REM Open Browser to Vite Dev Server
-timeout /t 2 /nobreak >nul
+ping -n 3 127.0.0.1 >nul
 start http://localhost:3000
 
 REM Start UI Vite Server in the main window
-cd ui
+cd /d "%~dp0ui"
 call npm run dev
-cd ..
+

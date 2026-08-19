@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import { useIPC } from '../context/IPCContext';
-import { Users, Radio, Lock, Unlock, Copy, Check, Music, Activity, ShieldCheck, X } from 'lucide-react';
+import { Radio, Lock, Unlock, Copy, Check, Activity, X } from 'lucide-react';
 
 interface LiveCollabRoomModalProps {
   isOpen: boolean;

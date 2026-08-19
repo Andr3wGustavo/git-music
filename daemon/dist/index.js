@@ -162,8 +162,30 @@ if (ledger.getHistory().length === 0) {
     ledger.createBranch('feat/guitar-solo-take3');
     ledger.createBranch('mix-master-loudness');
 }
+const http = __importStar(require("http"));
+const mobileServer_1 = require("./mobile/mobileServer");
 const server = new server_1.DaemonIPCServer(PORT, ledger, cas, PROJECT_ROOT);
 server.start();
+// Start Lightweight HTTP Server for Mobile Car-Test Companion
+const httpServer = http.createServer((req, res) => {
+    if (req.url === '/mobile' || req.url === '/car-test') {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        const state = server.assembleProjectState();
+        res.end(mobileServer_1.MobileCompanionServer.getMobileAppHTML(state.projectName, state.transport.bpm, state.history.length));
+    }
+    else if (req.url === '/api/status') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(server.assembleProjectState()));
+    }
+    else {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('Git-Music Local Daemon is Running. Open http://localhost:4848/mobile for Car-Test App.');
+    }
+});
+const HTTP_PORT = PORT + 1; // 4849
+httpServer.listen(HTTP_PORT, () => {
+    console.log(`📱 [Mobile Companion] Car-Test Web App active on: http://127.0.0.1:${HTTP_PORT}/mobile`);
+});
 const watcher = new watcher_1.ProjectFileWatcher(PROJECT_ROOT, async (eventType, filePath) => {
     console.log(`[Watcher] ${eventType.toUpperCase()} detected: ${filePath}`);
     // Inspect project file if it is an FLP, ALS, or RPP file
@@ -185,5 +207,6 @@ process.on('SIGINT', () => {
     console.log('\n[Shutdown] Stopping Git-Music daemon services...');
     watcher.stop();
     server.stop();
+    httpServer.close();
     process.exit(0);
 });

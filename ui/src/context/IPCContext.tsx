@@ -131,17 +131,6 @@ export interface PullRequest {
     lufsDelta?: number;
   }[];
 }
-
-export interface ProjectState {
-  projectName: string;
-  projectPath: string;
-  currentBranch: string;
-  headCommit: string | null;
-  branches: BranchInfo[];
-  history: CommitNode[];
-  stems: StemInfo[];
-  midiTracks: MIDITrack[];
-  comments: AudioComment[];
 export interface LiveProducerPresence {
   producerId: string;
   name: string;

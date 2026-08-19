@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { BookOpen, CheckCircle, Cpu, Radio, Music, Award, X, Sparkles, Sliders } from 'lucide-react';
+import { BookOpen, X } from 'lucide-react';
 
 interface DidacticGuideModalProps {
   isOpen: boolean;

@@ -3,11 +3,15 @@
   "version": "0.1.0",
   "description": "In-DAW Version Control & Collaboration System for Music Producers",
   "scripts": {
+    "start": "npm run dev",
+    "dev": "npm --prefix ui run dev",
     "dev:daemon": "npm --prefix daemon run dev",
     "dev:ui": "npm --prefix ui run dev",
+    "build": "npm run build:all",
     "build:daemon": "npm --prefix daemon run build",
     "build:ui": "npm --prefix ui run build",
     "build:all": "npm run build:daemon && npm run build:ui",
+    "preview": "npm --prefix ui run preview",
     "start:daemon": "node daemon/dist/index.js",
     "test": "npm --prefix daemon run test"
   },

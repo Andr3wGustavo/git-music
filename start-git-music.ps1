@@ -1,6 +1,9 @@
 # Git-Music PowerShell Startup Script
 $Host.UI.RawUI.WindowTitle = "Git-Music - In-DAW Version Control and Collaboration"
 
+# Ensure working directory is script root
+Set-Location -Path $PSScriptRoot
+
 Clear-Host
 Write-Host "==============================================================================" -ForegroundColor Cyan
 Write-Host "  🎵 GIT-MUSIC -- In-DAW Version Control and Collaboration Cockpit" -ForegroundColor White
@@ -46,13 +49,13 @@ Write-Host "====================================================================
 Write-Host ""
 
 # Launch Daemon in a dedicated background window
-Start-Process cmd.exe -ArgumentList '/k "npm --prefix daemon run start"'
+Start-Process cmd.exe -ArgumentList "/k cd /d `"$PSScriptRoot\daemon`" && npm run start"
 
 # Open Browser to Vite Dev Server
 Start-Sleep -Seconds 2
 Start-Process "http://localhost:3000"
 
 # Start UI Vite Server in the main PowerShell window
-Set-Location ui
+Set-Location "$PSScriptRoot\ui"
 npm run dev
-Set-Location ..
+
