@@ -15,42 +15,17 @@
 ## Interface Preview
 
 <div align="center">
-  <img src="docs/images/git-music-preview.png" alt="Git-Music Studio HUD Interface" width="850" />
-  <p><em>Figure 1: Git-Music Studio HUD &mdash; In-DAW rackmount cockpit featuring real-time A/B crossfading, 60 FPS FFT spectrum analysis, true-peak VU metering, and DAG commit history.</em></p>
+  <img src="gitmusic.png" alt="Git-Music In-DAW Studio Cockpit" width="100%" />
+  <p><em>Figure 1: Git-Music Studio HUD &mdash; In-DAW cockpit featuring real-time A/B crossfading, multi-track waveform inspection, piano roll diffing, and DAG commit history.</em></p>
 </div>
 
-```
-+-----------------------------------------------------------------------------+
-| [X] GIT-MUSIC STUDIO HUD v0.1.0                     [ R2 CLOUD: SYNCED ] [X] |
-+-----------------------------------------------------------------------------+
-| [STATUS] FL STUDIO 21 CONNECTED       BPM: 128.0   TIME: 4/4   CAS: 64% SAV |
-| BRANCH:  [ main / feat-synth-lead ]   LEDGER HASH: 7f3a9e...  PEERS: 2 LIVE |
-+-----------------------------------------------------------------------------+
-|                                                                             |
-| SNAPSHOT COMMIT ENGINE                                                      |
-| +-----------------------------------------------+ +-----------------------+ |
-| | Commit message (e.g. Sidechain compression)  | | [ RECORD SNAPSHOT ]   | |
-| +-----------------------------------------------+ +-----------------------+ |
-|                                                                             |
-| REAL-TIME A/B EQUAL-POWER CROSSFADER                          [ > PLAYBACK ]|
-| L [ =========--- ] -3.2 dBFS    R [ =========--- ] -3.2 dBFS      [ 0.0 dB ]|
-| +-------------------------------+ +---------------------------------------+ |
-| | [A] LIVE DAW MASTER OUTPUT    | | [B] COMMIT v2 (FabFilter Cut)         | |
-| +-------------------------------+ +---------------------------------------+ |
-|        [SOLO A] <=========== [ 50/50 BLEND ] ===========> [SOLO B]          |
-|                                                                             |
-| 60 FPS FFT SPECTRUM & PIANO ROLL DIFF                                       |
-| [20Hz]  ...|||.....|||||......|||||||.......|||||.....|||...  [20kHz]       |
-|                                                                             |
-| DAG COMMIT LEDGER (CLICK TO AUDITION)                                       |
-| * c4 (HEAD) - Sidechain compression on 808 sub bass         [ CURRENT ]     |
-| * c3 (12m)  - Lead synth EQ cleanup (FabFilter Pro-Q3)      [ AUDITION ]    |
-| * c2 (1h)   - Added drum groove and vocal chops             [ AUDITION ]    |
-| * c1 (init) - Initial project skeleton and arrangement       [ AUDITION ]    |
-|                                                                             |
-| [ ACTIVE PRODUCERS (2) ]    [ BRANCHES (3) ]    [ LEGAL SPLIT SHEETS ]      |
-+-----------------------------------------------------------------------------+
-```
+<br />
+
+<div align="center">
+  <img src="docs/images/gitmusic-audio-diff.png" alt="Multi-Track Stem Diff and Waveforms" width="32.8%" />
+  <img src="docs/images/gitmusic-piano-roll.png" alt="Visual MIDI Diff and Piano Roll Inspector" width="32.8%" />
+  <img src="docs/images/gitmusic-ai-copilot.png" alt="AI Acoustic and Mix Copilot" width="32.8%" />
+</div>
 
 ---
 
