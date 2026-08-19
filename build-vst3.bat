@@ -16,13 +16,13 @@ if %errorlevel% neq 0 (
         set CMAKE_BIN="C:\Program Files\CMake\bin\cmake.exe"
     ) else if exist "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" (
         set CMAKE_BIN="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
-    ) else if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" (
-        set CMAKE_BIN="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
+    ) else if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" (
+        set CMAKE_BIN="%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
     ) else (
         echo [WARNING] CMake binary not found in standard paths.
         echo Please install CMake or Visual Studio with C++ Desktop Development.
         echo.
-        echo For now, the Web Cockpit and Daemon run 100%% via: start-git-music.bat
+        echo For now, the Web Cockpit and Daemon run 100%% via start-git-music.bat
         pause
         exit /b 0
     )
